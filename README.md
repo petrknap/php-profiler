@@ -1,2 +1,7 @@
 # php-profiler
-PHP utils for code profiling
+
+PHP profiler by [Petr Knap].
+
+
+
+[Petr Knap]:http://petrknap.cz/
