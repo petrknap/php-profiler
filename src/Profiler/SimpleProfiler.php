@@ -9,26 +9,11 @@ namespace PetrKnap\Php\Profiler;
  * @since    2015-12-13
  * @category Debug
  * @package  PetrKnap\Php\Profiler
- * @version  0.5
+ * @version  0.6
  * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
  */
-class SimpleProfiler
+class SimpleProfiler implements ProfilerInterface
 {
-    #region Result keys
-    const START_LABEL = "start_label"; // string
-    const START_TIME = "start_time"; // float start time in seconds
-    const START_MEMORY_USAGE = "start_memory_usage"; // int amount of used memory at start in bytes
-    const FINISH_LABEL = "finish_label"; // string
-    const FINISH_TIME = "finish_time"; // float finish time in seconds
-    const FINISH_MEMORY_USAGE = "finish_memory_usage"; // int amount of used memory at finish in bytes
-    const TIME_OFFSET = "time_offset"; // float time offset in seconds
-    const MEMORY_USAGE_OFFSET = "memory_usage_offset"; // int amount of memory usage offset in bytes
-    const ABSOLUTE_DURATION = "absolute_duration"; // float absolute duration in seconds
-    const DURATION = "duration"; // float duration in seconds
-    const ABSOLUTE_MEMORY_USAGE_CHANGE = "absolute_memory_usage_change"; // int absolute memory usage change in bytes
-    const MEMORY_USAGE_CHANGE = "memory_usage_change"; // int memory usage change in bytes
-    #endregion
-
     private static $enabled = false;
 
     private static $stack = [];
