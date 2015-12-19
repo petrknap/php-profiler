@@ -14,7 +14,7 @@ namespace PetrKnap\Php\Profiler;
  */
 class SimpleProfiler implements ProfilerInterface
 {
-    private static $enabled = false;
+    protected static $enabled = false;
 
     private static $stack = [];
 
