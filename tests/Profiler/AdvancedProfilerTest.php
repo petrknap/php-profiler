@@ -49,4 +49,24 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             $result[AdvancedProfiler::FINISH_LABEL]
         );
     }
+
+    public function testPostProcessorSupport()
+    {
+        $postProcessorCallsCounter = 0;
+        AdvancedProfiler::setPostProcessor(
+            function ($result) use (&$postProcessorCallsCounter) {
+                $postProcessorCallsCounter++;
+                $this->assertTrue(is_array($result));
+            }
+        );
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertEquals($i, $postProcessorCallsCounter);
+
+            AdvancedProfiler::start();
+            AdvancedProfiler::finish();
+
+            $this->assertEquals($i + 1, $postProcessorCallsCounter);
+        }
+    }
 }

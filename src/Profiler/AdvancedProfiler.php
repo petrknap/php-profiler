@@ -9,11 +9,28 @@ namespace PetrKnap\Php\Profiler;
  * @since    2015-12-19
  * @category Debug
  * @package  PetrKnap\Php\Profiler
- * @version  0.1
+ * @version  0.2
  * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
  */
 class AdvancedProfiler extends SimpleProfiler implements ProfilerInterface
 {
+    /**
+     * @var callable
+     */
+    private static $postProcessor = null;
+
+    /**
+     * Set post processor
+     *
+     * Post processor is callable with one input argument (return from finish method) and is called at the end of finish method.
+     *
+     * @param callable $postProcessor
+     */
+    public static function setPostProcessor(callable $postProcessor)
+    {
+        self::$postProcessor = $postProcessor;
+    }
+
     /**
      * Get current "{file}#{line}"
      *
@@ -71,7 +88,13 @@ class AdvancedProfiler extends SimpleProfiler implements ProfilerInterface
                 $label = self::getCurrentFileHashLine(1);
             }
 
-            return parent::finish($label);
+            $result = parent::finish($label);
+
+            if (self::$postProcessor === null) {
+                return $result;
+            }
+
+            return call_user_func(self::$postProcessor, $result);
         }
 
         return false;
