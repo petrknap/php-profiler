@@ -57,6 +57,10 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             function ($result) use (&$postProcessorCallsCounter) {
                 $postProcessorCallsCounter++;
                 $this->assertTrue(is_array($result));
+
+                $result["post_processors_note"] = "note";
+
+                return $result;
             }
         );
 
@@ -64,7 +68,10 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($i, $postProcessorCallsCounter);
 
             AdvancedProfiler::start();
-            AdvancedProfiler::finish();
+            $result = AdvancedProfiler::finish();
+
+            $this->assertArrayHasKey("post_processors_note", $result);
+            $this->assertEquals("note", $result["post_processors_note"]);
 
             $this->assertEquals($i + 1, $postProcessorCallsCounter);
         }
