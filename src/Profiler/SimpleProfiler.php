@@ -9,13 +9,30 @@ namespace PetrKnap\Php\Profiler;
  * @since    2015-12-13
  * @category Debug
  * @package  PetrKnap\Php\Profiler
- * @version  0.6
+ * @version  0.7
  * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
  */
-class SimpleProfiler implements ProfilerInterface
+class SimpleProfiler
 {
+    #region Meta keys
+    const START_LABEL = "start_label"; // string
+    const START_TIME = "start_time"; // float start time in seconds
+    const START_MEMORY_USAGE = "start_memory_usage"; // int amount of used memory at start in bytes
+    const FINISH_LABEL = "finish_label"; // string
+    const FINISH_TIME = "finish_time"; // float finish time in seconds
+    const FINISH_MEMORY_USAGE = "finish_memory_usage"; // int amount of used memory at finish in bytes
+    const TIME_OFFSET = "time_offset"; // float time offset in seconds
+    const MEMORY_USAGE_OFFSET = "memory_usage_offset"; // int amount of memory usage offset in bytes
+    #endregion
+
+    /**
+     * @var bool
+     */
     protected static $enabled = false;
 
+    /**
+     * @var Profile[]
+     */
     private static $stack = [];
 
     /**
@@ -46,13 +63,16 @@ class SimpleProfiler implements ProfilerInterface
             $now = microtime(true);
             $memoryUsage = memory_get_usage(true);
 
-            array_push(self::$stack, [
+            $profile = new Profile();
+            $profile->meta = [
                 self::START_LABEL => $label,
                 self::TIME_OFFSET => 0,
-                self::START_TIME => $now,
                 self::MEMORY_USAGE_OFFSET => 0,
+                self::START_TIME => $now,
                 self::START_MEMORY_USAGE => $memoryUsage
-            ]);
+            ];
+
+            array_push(self::$stack, $profile);
 
             return true;
         }
@@ -64,7 +84,7 @@ class SimpleProfiler implements ProfilerInterface
      * Finish profiling and get result
      *
      * @param string $label
-     * @return array|bool result as array on success or false on failure
+     * @return Profile|bool profile on success or false on failure
      */
     public static function finish($label = null)
     {
@@ -76,25 +96,25 @@ class SimpleProfiler implements ProfilerInterface
                 throw new \OutOfRangeException("Call " . __CLASS__ . "::start() first.");
             }
 
-            $result = array_pop(self::$stack);
-
-            $result[self::FINISH_LABEL] = $label;
-            $result[self::FINISH_TIME] = $now;
-            $result[self::FINISH_MEMORY_USAGE] = $memoryUsage;
-            $result[self::ABSOLUTE_DURATION] = $result[self::FINISH_TIME] - $result[self::START_TIME];
-            $result[self::DURATION] = $result[self::ABSOLUTE_DURATION] - $result[self::TIME_OFFSET];
-            $result[self::ABSOLUTE_MEMORY_USAGE_CHANGE] = $result[self::FINISH_MEMORY_USAGE] - $result[self::START_MEMORY_USAGE];
-            $result[self::MEMORY_USAGE_CHANGE] = $result[self::ABSOLUTE_MEMORY_USAGE_CHANGE] - $result[self::MEMORY_USAGE_OFFSET];
+            /** @var Profile $profile */
+            $profile = array_pop(self::$stack);
+            $profile->meta[self::FINISH_LABEL] = $label;
+            $profile->meta[self::FINISH_TIME] = $now;
+            $profile->meta[self::FINISH_MEMORY_USAGE] = $memoryUsage;
+            $profile->absoluteDuration = $profile->meta[self::FINISH_TIME] - $profile->meta[self::START_TIME];
+            $profile->duration = $profile->absoluteDuration - $profile->meta[self::TIME_OFFSET];
+            $profile->absoluteMemoryUsageChange = $profile->meta[self::FINISH_MEMORY_USAGE] - $profile->meta[self::START_MEMORY_USAGE];
+            $profile->memoryUsageChange = $profile->absoluteMemoryUsageChange - $profile->meta[self::MEMORY_USAGE_OFFSET];
 
             if (!empty(self::$stack)) {
-                $timeOffset = &self::$stack[count(self::$stack) - 1][self::TIME_OFFSET];
-                $timeOffset = $timeOffset + $result[self::ABSOLUTE_DURATION];
+                $timeOffset = &self::$stack[count(self::$stack) - 1]->meta[self::TIME_OFFSET];
+                $timeOffset = $timeOffset + $profile->absoluteDuration;
 
-                $memoryUsageOffset = &self::$stack[count(self::$stack) - 1][self::MEMORY_USAGE_OFFSET];
-                $memoryUsageOffset = $memoryUsageOffset + $result[self::ABSOLUTE_MEMORY_USAGE_CHANGE];
+                $memoryUsageOffset = &self::$stack[count(self::$stack) - 1]->meta[self::MEMORY_USAGE_OFFSET];
+                $memoryUsageOffset = $memoryUsageOffset + $profile->absoluteMemoryUsageChange;
             }
 
-            return $result;
+            return $profile;
         }
 
         return false;

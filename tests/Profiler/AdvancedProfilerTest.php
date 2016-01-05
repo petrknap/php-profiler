@@ -1,6 +1,7 @@
 <?php
 
 use PetrKnap\Php\Profiler\AdvancedProfiler;
+use PetrKnap\Php\Profiler\Profile;
 
 class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             sprintf(
                 "%s#%s",
                 __FILE__,
-                22
+                23
             ),
             AdvancedProfiler::getCurrentFileHashLine()
         );
@@ -35,18 +36,18 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             sprintf(
                 "%s#%s",
                 __FILE__,
-                31
+                32
             ),
-            $result[AdvancedProfiler::START_LABEL]
+            $result->meta[AdvancedProfiler::START_LABEL]
         );
 
         $this->assertEquals(
             sprintf(
                 "%s#%s",
                 __FILE__,
-                32
+                33
             ),
-            $result[AdvancedProfiler::FINISH_LABEL]
+            $result->meta[AdvancedProfiler::FINISH_LABEL]
         );
     }
 
@@ -56,9 +57,10 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
         AdvancedProfiler::setPostProcessor(
             function ($result) use (&$postProcessorCallsCounter) {
                 $postProcessorCallsCounter++;
-                $this->assertTrue(is_array($result));
 
-                $result["post_processors_note"] = "note";
+                $this->assertInstanceOf(get_class(new Profile()), $result);
+
+                $result->meta["post_processors_note"] = "note";
 
                 return $result;
             }
@@ -70,10 +72,40 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             AdvancedProfiler::start();
             $result = AdvancedProfiler::finish();
 
-            $this->assertArrayHasKey("post_processors_note", $result);
-            $this->assertEquals("note", $result["post_processors_note"]);
+            $this->assertArrayHasKey("post_processors_note", $result->meta);
+            $this->assertEquals("note", $result->meta["post_processors_note"]);
 
             $this->assertEquals($i + 1, $postProcessorCallsCounter);
         }
+    }
+
+    public function testPerformanceIsNotIntrusive()
+    {
+        $start = microtime(true);
+
+        AdvancedProfiler::start();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.001, $diff);
+
+
+        $start = microtime(true);
+
+        AdvancedProfiler::finish();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.001, $diff);
+
+
+        $start = microtime(true);
+
+        AdvancedProfiler::start();
+        AdvancedProfiler::finish();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.002, $diff);
     }
 }
