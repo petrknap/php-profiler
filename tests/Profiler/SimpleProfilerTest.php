@@ -147,7 +147,7 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         $this->assertLessThan(0, $result->memoryUsageChange);
     }
 
-    public function testPerformanceTest()
+    public function testPerformanceIsNotIntrusive()
     {
         $start = microtime(true);
 

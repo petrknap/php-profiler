@@ -79,7 +79,7 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function testPerformanceTest()
+    public function testPerformanceIsNotIntrusive()
     {
         $start = microtime(true);
 
