@@ -1,11 +1,10 @@
 <?php
 
+use PetrKnap\Php\Profiler\Profile;
 use PetrKnap\Php\Profiler\SimpleProfiler;
 
 class SimpleProfilerTest extends PHPUnit_Framework_TestCase
 {
-    const ACCEPTABLE_DELAY = 0.002; // 2 ms
-
     public function setUp()
     {
         parent::setUp();
@@ -13,22 +12,15 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         SimpleProfiler::enable();
     }
 
-    private function checkResult(array $result, $startLabel, $finishLabel)
+    private function checkResult($result, $startLabel, $finishLabel)
     {
-        $this->assertArrayHasKey(SimpleProfiler::START_LABEL, $result);
-        $this->assertArrayHasKey(SimpleProfiler::START_TIME, $result);
-        $this->assertArrayHasKey(SimpleProfiler::START_MEMORY_USAGE, $result);
-        $this->assertArrayHasKey(SimpleProfiler::FINISH_LABEL, $result);
-        $this->assertArrayHasKey(SimpleProfiler::FINISH_TIME, $result);
-        $this->assertArrayHasKey(SimpleProfiler::FINISH_MEMORY_USAGE, $result);
-        $this->assertArrayHasKey(SimpleProfiler::TIME_OFFSET, $result);
-        $this->assertArrayHasKey(SimpleProfiler::ABSOLUTE_DURATION, $result);
-        $this->assertArrayHasKey(SimpleProfiler::DURATION, $result);
+        /** @var Profile $result */
+        $this->assertInstanceOf(get_class(new Profile()), $result);
 
-        $this->assertLessThanOrEqual($result[SimpleProfiler::ABSOLUTE_DURATION], $result[SimpleProfiler::DURATION]);
+        $this->assertLessThanOrEqual($result->absoluteDuration, $result->duration);
 
-        $this->assertEquals($startLabel, $result[SimpleProfiler::START_LABEL]);
-        $this->assertEquals($finishLabel, $result[SimpleProfiler::FINISH_LABEL]);
+        $this->assertEquals($startLabel, $result->meta[SimpleProfiler::START_LABEL]);
+        $this->assertEquals($finishLabel, $result->meta[SimpleProfiler::FINISH_LABEL]);
     }
 
     public function testEmptyStack()
@@ -43,7 +35,7 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         SimpleProfiler::enable();
 
         $this->assertTrue(SimpleProfiler::start());
-        $this->assertTrue(is_array(SimpleProfiler::finish()));
+        $this->assertInstanceOf(get_class(new Profile()), SimpleProfiler::finish());
     }
 
     public function testDisable()
@@ -116,13 +108,13 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         $A = SimpleProfiler::finish();
         #endregion
 
-        $this->assertEquals(6, $A[SimpleProfiler::ABSOLUTE_DURATION], "", self::ACCEPTABLE_DELAY);
-        $this->assertEquals(3, $B[SimpleProfiler::ABSOLUTE_DURATION], "",  self::ACCEPTABLE_DELAY);
-        $this->assertEquals(2, $C[SimpleProfiler::ABSOLUTE_DURATION], "",  self::ACCEPTABLE_DELAY);
+        $this->assertEquals(6, $A->absoluteDuration, "", 0.5);
+        $this->assertEquals(3, $B->absoluteDuration, "", 0.5);
+        $this->assertEquals(2, $C->absoluteDuration, "", 0.5);
 
-        $this->assertEquals(1, $A[SimpleProfiler::DURATION], "", self::ACCEPTABLE_DELAY);
-        $this->assertEquals(3, $B[SimpleProfiler::DURATION], "", self::ACCEPTABLE_DELAY);
-        $this->assertEquals(2, $C[SimpleProfiler::DURATION], "", self::ACCEPTABLE_DELAY);
+        $this->assertEquals(1, $A->duration, "", 0.5);
+        $this->assertEquals(3, $B->duration, "", 0.5);
+        $this->assertEquals(2, $C->duration, "", 0.5);
     }
 
     public function testMemoryProfiling()
@@ -138,10 +130,10 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
 
         $result = SimpleProfiler::finish();
 
-        $this->assertGreaterThan($result[SimpleProfiler::START_MEMORY_USAGE], $result[SimpleProfiler::FINISH_MEMORY_USAGE]);
-        $this->assertGreaterThan($result[SimpleProfiler::MEMORY_USAGE_CHANGE], $result[SimpleProfiler::ABSOLUTE_MEMORY_USAGE_CHANGE]);
-        $this->assertGreaterThan(0, $result[SimpleProfiler::ABSOLUTE_MEMORY_USAGE_CHANGE]);
-        $this->assertGreaterThan(0, $result[SimpleProfiler::MEMORY_USAGE_CHANGE]);
+        $this->assertGreaterThan($result->meta[SimpleProfiler::START_MEMORY_USAGE], $result->meta[SimpleProfiler::FINISH_MEMORY_USAGE]);
+        $this->assertGreaterThan($result->memoryUsageChange, $result->absoluteMemoryUsageChange);
+        $this->assertGreaterThan(0, $result->absoluteMemoryUsageChange);
+        $this->assertGreaterThan(0, $result->memoryUsageChange);
 
         SimpleProfiler::start();
 
@@ -149,9 +141,39 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
 
         $result = SimpleProfiler::finish();
 
-        $this->assertLessThan($result[SimpleProfiler::START_MEMORY_USAGE], $result[SimpleProfiler::FINISH_MEMORY_USAGE]);
-        $this->assertEquals($result[SimpleProfiler::ABSOLUTE_MEMORY_USAGE_CHANGE], $result[SimpleProfiler::MEMORY_USAGE_CHANGE]);
-        $this->assertLessThan(0, $result[SimpleProfiler::ABSOLUTE_MEMORY_USAGE_CHANGE]);
-        $this->assertLessThan(0, $result[SimpleProfiler::MEMORY_USAGE_CHANGE]);
+        $this->assertLessThan($result->meta[SimpleProfiler::START_MEMORY_USAGE], $result->meta[SimpleProfiler::FINISH_MEMORY_USAGE]);
+        $this->assertEquals($result->absoluteMemoryUsageChange, $result->memoryUsageChange);
+        $this->assertLessThan(0, $result->absoluteMemoryUsageChange);
+        $this->assertLessThan(0, $result->memoryUsageChange);
+    }
+
+    public function testPerformanceTest()
+    {
+        $start = microtime(true);
+
+        SimpleProfiler::start();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.001, $diff);
+
+
+        $start = microtime(true);
+
+        SimpleProfiler::finish();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.001, $diff);
+
+
+        $start = microtime(true);
+
+        SimpleProfiler::start();
+        SimpleProfiler::finish();
+
+        $diff = microtime(true) - $start;
+
+        $this->assertLessThanOrEqual(0.002, $diff);
     }
 }

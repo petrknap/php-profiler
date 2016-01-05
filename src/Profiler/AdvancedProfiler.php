@@ -9,10 +9,10 @@ namespace PetrKnap\Php\Profiler;
  * @since    2015-12-19
  * @category Debug
  * @package  PetrKnap\Php\Profiler
- * @version  0.2
+ * @version  0.3
  * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
  */
-class AdvancedProfiler extends SimpleProfiler implements ProfilerInterface
+class AdvancedProfiler extends SimpleProfiler
 {
     /**
      * @var callable
@@ -79,7 +79,7 @@ class AdvancedProfiler extends SimpleProfiler implements ProfilerInterface
      * Finish profiling and get result
      *
      * @param string $label
-     * @return array|bool result as array on success or false on failure
+     * @return Profile|mixed|bool profile or return from post processor on success or false on failure
      */
     public static function finish($label = null)
     {
@@ -88,13 +88,13 @@ class AdvancedProfiler extends SimpleProfiler implements ProfilerInterface
                 $label = self::getCurrentFileHashLine(1);
             }
 
-            $result = parent::finish($label);
+            $profile = parent::finish($label);
 
             if (self::$postProcessor === null) {
-                return $result;
+                return $profile;
             }
 
-            return call_user_func(self::$postProcessor, $result);
+            return call_user_func(self::$postProcessor, $profile);
         }
 
         return false;
