@@ -64,11 +64,13 @@ class SimpleProfiler
             $memoryUsage = memory_get_usage(true);
 
             $profile = new Profile();
-            $profile->meta[self::START_LABEL] = $label;
-            $profile->meta[self::TIME_OFFSET] = 0;
-            $profile->meta[self::MEMORY_USAGE_OFFSET] = 0;
-            $profile->meta[self::START_TIME] = $now;
-            $profile->meta[self::START_MEMORY_USAGE] = $memoryUsage;
+            $profile->meta = [
+                self::START_LABEL => $label,
+                self::TIME_OFFSET => 0,
+                self::MEMORY_USAGE_OFFSET => 0,
+                self::START_TIME => $now,
+                self::START_MEMORY_USAGE => $memoryUsage
+            ];
 
             array_push(self::$stack, $profile);
 
