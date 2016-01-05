@@ -59,7 +59,7 @@ class SimpleProfiler
      */
     public static function start($label = null)
     {
-        if(self::$enabled) {
+        if (self::$enabled) {
             $now = microtime(true);
             $memoryUsage = memory_get_usage(true);
 
@@ -88,7 +88,7 @@ class SimpleProfiler
      */
     public static function finish($label = null)
     {
-        if(self::$enabled) {
+        if (self::$enabled) {
             $now = microtime(true);
             $memoryUsage = memory_get_usage(true);
 

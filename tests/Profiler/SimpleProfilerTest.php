@@ -122,7 +122,7 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         SimpleProfiler::start();
 
         $largeObject = null;
-        for($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             SimpleProfiler::start();
             $largeObject = new \Exception("Large object", 0, $largeObject);
             SimpleProfiler::finish();
