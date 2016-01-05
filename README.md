@@ -3,5 +3,68 @@
 PHP profiler by [Petr Knap].
 
 
+## Components
+
+### Profile
+
+[`Profile`] is base data structure returned by profilers.
+
+
+### SimpleProfiler
+
+[`SimpleProfiler`] is easy-to-use and quick static class for PHP code profiling. You can extend it and make your own specific profiler just for your use-case.
+
+#### Usage
+
+```php
+SimpleProfiler::enable();            // Enable profiler
+echo "Hello";                        // Do what you need to do before you start profiling
+SimpleProfiler::start();             // Start profiling where you wish to start profiling
+echo " ";                            // Do what you need to profile here
+$profile = SimpleProfiler::finish(); // Finish profiling where you wish to finish profiling
+echo "World";                        // Do what you need to do after you finish profiling
+var_dump($profile);                  // Process your profile here
+```
+
+
+### AdvancedProfiler
+
+[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`].
+
+#### Usage
+
+[`AdvancedProfiler`] is dynamically developed. If you want to see an example of usage visit [`AdvancedProfilerTest`].
+
+
+## How to install
+
+Run `composer require petrknap/php-profiler` or merge this JSON code with your project `composer.json` file manually and run `composer install`. Instead of `dev-master` you can use [one of released versions].
+
+```json
+{
+    "require": {
+        "petrknap/php-profiler": "dev-master"
+    }
+}
+```
+
+Or manually clone this repository via `git clone https://github.com/petrknap/php-profiler.git` or download [this repository as ZIP] and extract files into your project.
+
+### Versioning
+
+Version is sequence of 6 numbers separated by dot (for example `1.2.3.4.5.6`). First pair of numbers is [`Profile`] version, second pair is [`SimpleProfiler`] version and third pair is [`AdvancedProfiler`] version.
+
+If you wish to fix:
+* [`Profile`] use `1.*`
+* [`SimpleProfiler`] use `1.2.3.*`
+* [`AdvancedProfiler`] use `1.2.3.4.5.*`
+* exact version use `1.2.3.4.5.6`
+
 
 [Petr Knap]:http://petrknap.cz/
+[`Profile`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/Profile.php
+[`SimpleProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/SimpleProfiler.php
+[`AdvancedProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/AdvancedProfiler.php
+[`AdvancedProfilerTest`]:https://github.com/petrknap/php-profiler/blob/master/tests/Profiler/AdvancedProfilerTest.php
+[one of released versions]:https://github.com/petrknap/php-profiler/releases
+[this repository as ZIP]:https://github.com/petrknap/php-profiler/archive/master.zip
