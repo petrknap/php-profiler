@@ -52,13 +52,26 @@ Or manually clone this repository via `git clone https://github.com/petrknap/php
 
 ### Versioning
 
-Version is sequence of 6 numbers separated by dot (for example `1.2.34.56`). First pair of numbers is [`Profile`] version, second pair is [`SimpleProfiler`] version and third pair is [`AdvancedProfiler`] version.
+Version is sequence of 4 numbers separated by dot (for example `1.2.3.4`). First pair of numbers is [`Profile`] version, second pair is reflection of changes in [`SimpleProfiler`] and [`AdvancedProfiler`] versions.
+
+```
+       Profile     SimpleProfiler
+       |     |     |     |
+     (maj) (min) (c+1) (d+1)
+       |     |     |     |
+       a  .  b  .  c  .  d
+                   |     |
+                 (c+1) (d+1)
+                   |     |
+                   AdvancedProfiler
+```
+
 
 If you wish to fix:
-* [`Profile`] use `1.*`
-* [`SimpleProfiler`] use `1.2.3*`
-* [`AdvancedProfiler`] use `1.2.34.5*`
-* exact version use `1.2.3.4.5.6`
+* [`Profile`] major version use `~1`
+* [`Profile`] minor version use `~1.2`
+* [`SimpleProfiler`] or [`AdvancedProfiler`] major version `~1.2.3`
+* exact version use `1.2.3.4`
 
 
 [Petr Knap]:http://petrknap.cz/
