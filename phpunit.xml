@@ -5,6 +5,6 @@
         </testsuite>
     </testsuites>
     <logging>
-        <log type="testdox-text"  target="./tests/phpunit.log" />
+        <log type="testdox-text" target="./tests/phpunit.log"/>
     </logging>
 </phpunit>

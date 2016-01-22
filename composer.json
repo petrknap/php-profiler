@@ -1,36 +1,36 @@
 {
-    "name": "petrknap/php-profiler",
-    "description": "PHP profiler by Petr Knap",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Petr Knap",
-            "email": "dev@petrknap.cz",
-            "homepage": "http://petrknap.cz",
-            "role": "Developer"
-        }
-    ],
-    "homepage": "https://github.com/petrknap/php-profiler",
-    "config": {
-        "preferred-install": "dist"
-    },
-    "require": {
-        "php": ">=5.3"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.*"
-    },
-    "scripts": {
-        "test": [
-            "./vendor/bin/phpunit"
-        ],
-        "post-autoload-dump": [
-            "@test"
-        ]
-    },
-    "autoload": {
-        "psr-4": {
-            "PetrKnap\\Php\\Profiler\\": "src/Profiler"
-        }
+  "name": "petrknap/php-profiler",
+  "description": "PHP profiler by Petr Knap",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Petr Knap",
+      "email": "dev@petrknap.cz",
+      "homepage": "http://petrknap.cz",
+      "role": "Developer"
     }
+  ],
+  "homepage": "https://github.com/petrknap/php-profiler",
+  "config": {
+    "preferred-install": "dist"
+  },
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.*"
+  },
+  "scripts": {
+    "test": [
+      "./vendor/bin/phpunit"
+    ],
+    "post-autoload-dump": [
+      "@test"
+    ]
+  },
+  "autoload": {
+    "psr-4": {
+      "PetrKnap\\Php\\Profiler\\": "src/Profiler"
+    }
+  }
 }
