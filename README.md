@@ -5,9 +5,8 @@ PHP profiler by [Petr Knap].
 * [Components](#components)
     * [Profile](#profile)
     * [SimpleProfiler](#simpleprofiler)
-        * [Usage of SimpleProfiler](#usage-of-simpleprofiler)
+        * [Usage](#usage)
     * [AdvancedProfiler](#advancedprofiler)
-        * [Usage of AdvancedProfiler](#usage-of-advancedprofiler)
 * [How to install](#how-to-install)
     * [Versioning](#versioning)
 
@@ -23,7 +22,7 @@ PHP profiler by [Petr Knap].
 
 [`SimpleProfiler`] is easy-to-use and quick static class for PHP code profiling. You can extend it and make your own specific profiler just for your use-case.
 
-#### Usage of SimpleProfiler
+#### Usage
 
 ```php
 SimpleProfiler::enable();            // Enable profiler
@@ -38,11 +37,7 @@ var_dump($profile);                  // Process your profile here
 
 ### AdvancedProfiler
 
-[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`].
-
-#### Usage of AdvancedProfiler
-
-[`AdvancedProfiler`] is dynamically developed. If you want to see an example of usage visit [`AdvancedProfilerTest`].
+[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`]. [`AdvancedProfiler`] is dynamically developed - if you want to see an example of usage, then visit [`AdvancedProfilerTest`].
 
 
 ## How to install
