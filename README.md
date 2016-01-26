@@ -7,7 +7,7 @@ PHP profiler by [Petr Knap].
     * [SimpleProfiler](#simpleprofiler)
         * [Usage of SimpleProfiler](#usage-of-simpleprofiler)
     * [AdvancedProfiler](#advancedprofiler)
-        * [Usage](#usage-of-advancedprofiler)
+        * [Usage of AdvancedProfiler](#usage-of-advancedprofiler)
 * [How to install](#how-to-install)
     * [Versioning](#versioning)
 
