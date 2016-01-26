@@ -68,9 +68,9 @@ Version is sequence of 4 numbers separated by dot (for example `1.2.3.4`). First
 
 
 If you wish to fix:
-* [`Profile`] major version use `~1`
-* [`Profile`] minor version use `~1.2`
-* [`SimpleProfiler`] or [`AdvancedProfiler`] major version `~1.2.3`
+* [`Profile`] major version use `1.*`
+* [`Profile`] minor version use `1.2.*`
+* [`SimpleProfiler`] or [`AdvancedProfiler`] major version `1.2.3.*`
 * exact version use `1.2.3.4`
 
 
