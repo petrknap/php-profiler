@@ -37,7 +37,7 @@ var_dump($profile);                  // Process your profile here
 
 ### AdvancedProfiler
 
-[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`]. [`AdvancedProfiler`] is dynamically developed - if you want to see an example of usage, then visit [`AdvancedProfilerTest`].
+[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`] and is developed dynamically. If you want to see an example of usage, then visit [`AdvancedProfilerTest`].
 
 
 ## How to install
