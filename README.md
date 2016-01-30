@@ -33,11 +33,11 @@ PHP profiler by [Petr Knap].
 
 ```php
 SimpleProfiler::enable();            // Enable profiler
-echo "Hello";                        // Do what you need to do before you start profiling
+$img = Image::fromFile("./img.png"); // Do what you need to do before you start profiling
 SimpleProfiler::start();             // Start profiling where you wish to start profiling
-echo " ";                            // Do what you need to profile here
+$img->rotate(180);                   // Do what you need to profile here
 $profile = SimpleProfiler::finish(); // Finish profiling where you wish to finish profiling
-echo "World";                        // Do what you need to do after you finish profiling
+unset($img);                         // Do what you need to do after you finish profiling
 var_dump($profile);                  // Process your profile here
 ```
 
