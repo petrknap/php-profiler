@@ -2,7 +2,7 @@
 
 PHP profiler by [Petr Knap].
 
-* [What is profiling?](#what-is-profiling?)
+* [What is profiling?](#what-is-profiling)
 * [Components](#components)
     * [Profile](#profile)
     * [SimpleProfiler](#simpleprofiler)
