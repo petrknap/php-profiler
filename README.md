@@ -2,6 +2,7 @@
 
 PHP profiler by [Petr Knap].
 
+* [What is profiling?](#what-is-profiling?)
 * [Components](#components)
     * [Profile](#profile)
     * [SimpleProfiler](#simpleprofiler)
@@ -9,6 +10,12 @@ PHP profiler by [Petr Knap].
     * [AdvancedProfiler](#advancedprofiler)
 * [How to install](#how-to-install)
     * [Versioning](#versioning)
+
+
+## What is profiling?
+
+> In software engineering, **profiling** (*"program profiling"*, *"software profiling"*) is a form of dynamic program analysis that measures, for example, the space (memory) or time complexity of a program, the usage of particular instructions, or the frequency and duration of function calls. Most commonly, profiling information serves **to aid program optimization**.
+-- [Profiling (computer programming) - Wikipedia, The Free Encyclopedia]
 
 
 ## Components
@@ -70,7 +77,6 @@ Version is sequence of 4 numbers separated by dot (for example `1.2.3.4`). First
                    AdvancedProfiler
 ```
 
-
 If you wish to fix:
 * [`Profile`] major version use `1.*`
 * [`Profile`] minor version use `1.2.*`
@@ -78,7 +84,9 @@ If you wish to fix:
 * exact version use `1.2.3.4`
 
 
+
 [Petr Knap]:http://petrknap.cz/
+[Profiling (computer programming) - Wikipedia, The Free Encyclopedia]:https://en.wikipedia.org/w/index.php?title=Profiling_(computer_programming)&oldid=697419059
 [`Profile`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/Profile.php
 [`SimpleProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/SimpleProfiler.php
 [`AdvancedProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/AdvancedProfiler.php
