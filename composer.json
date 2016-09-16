@@ -12,17 +12,20 @@
   ],
   "homepage": "https://github.com/petrknap/php-profiler",
   "config": {
-    "preferred-install": "dist"
+    "platform": {
+      "php": "5.4",
+      "ext-dom": true
+    }
   },
   "require": {
     "php": ">=5.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "4.*"
+    "phpunit/phpunit": "^4.8"
   },
   "scripts": {
-    "test": [
-      "./vendor/bin/phpunit"
+    "tests/": [
+      "sudo docker run -v $(pwd):/app --rm php:5.4-cli bash -c 'cd /app && php ./vendor/bin/phpunit'"
     ],
     "post-autoload-dump": [
       "@test"
