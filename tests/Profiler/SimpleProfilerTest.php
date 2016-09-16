@@ -1,9 +1,11 @@
 <?php
 
+namespace PetrKnap\Php\Profiler\Test;
+
 use PetrKnap\Php\Profiler\Profile;
 use PetrKnap\Php\Profiler\SimpleProfiler;
 
-class SimpleProfilerTest extends PHPUnit_Framework_TestCase
+class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {

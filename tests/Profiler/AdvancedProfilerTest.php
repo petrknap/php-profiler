@@ -1,9 +1,11 @@
 <?php
 
+namespace PetrKnap\Php\Profiler\Test;
+
 use PetrKnap\Php\Profiler\AdvancedProfiler;
 use PetrKnap\Php\Profiler\Profile;
 
-class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
+class AdvancedProfilerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {

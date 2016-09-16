@@ -33,7 +33,8 @@
   },
   "autoload": {
     "psr-4": {
-      "PetrKnap\\Php\\Profiler\\": "src/Profiler"
+      "PetrKnap\\Php\\Profiler\\": "src/Profiler",
+      "PetrKnap\\Php\\Profiler\\Test\\": "tests/Profiler"
     }
   }
 }
