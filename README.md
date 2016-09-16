@@ -9,7 +9,6 @@ PHP profiler by [Petr Knap].
         * [Usage](#usage)
     * [AdvancedProfiler](#advancedprofiler)
 * [How to install](#how-to-install)
-    * [Versioning](#versioning)
 
 
 ## What is profiling?
@@ -60,28 +59,6 @@ Run `composer require petrknap/php-profiler` or merge this JSON code with your p
 ```
 
 Or manually clone this repository via `git clone https://github.com/petrknap/php-profiler.git` or download [this repository as ZIP] and extract files into your project.
-
-### Versioning
-
-Version is sequence of 4 numbers separated by dot (for example `1.2.3.4`). First pair of numbers is [`Profile`] version, second pair is reflection of changes in [`SimpleProfiler`] and [`AdvancedProfiler`] versions.
-
-```
-       Profile     SimpleProfiler
-       |     |     |     |
-     (maj) (min) (c+1) (d+1)
-       |     |     |     |
-       a  .  b  .  c  .  d
-                   |     |
-                 (c+1) (d+1)
-                   |     |
-                   AdvancedProfiler
-```
-
-If you wish to fix:
-* [`Profile`] major version use `1.*`
-* [`Profile`] minor version use `1.2.*`
-* [`SimpleProfiler`] or [`AdvancedProfiler`] major version use `1.2.3.*`
-* exact version use `1.2.3.4`
 
 
 
