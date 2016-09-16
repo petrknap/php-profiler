@@ -178,4 +178,13 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertLessThanOrEqual(0.002, $diff);
     }
+
+    public function testLabelFormattingWorks()
+    {
+        SimpleProfiler::start("From %s#%s", __FILE__, __LINE__);
+        $profile = SimpleProfiler::finish("To %s#%s", __FILE__, __LINE__);
+
+        $this->assertEquals(sprintf("From %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::START_LABEL]);
+        $this->assertEquals(sprintf("To %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::FINISH_LABEL]);
+    }
 }

@@ -54,38 +54,36 @@ class AdvancedProfiler extends SimpleProfiler
     }
 
     /**
-     * Start profiling
-     *
-     * @param string $label
-     * @return bool true on success or false on failure
+     * @inheritdoc
      */
-    public static function start($label = null)
+    public static function start($labelOrFormat = null, $args = null, $_ = null)
     {
         if (self::$enabled) {
-            if ($label === null) {
-                $label = self::getCurrentFileHashLine(1);
+            if ($labelOrFormat === null) {
+                $labelOrFormat = self::getCurrentFileHashLine(1);
+                $args = null;
+                $_ = null;
             }
 
-            return parent::start($label);
+            return parent::start($labelOrFormat, $args, $_);
         }
 
         return false;
     }
 
     /**
-     * Finish profiling and get result
-     *
-     * @param string $label
-     * @return Profile|mixed|bool profile or return from post processor on success or false on failure
+     * @inheritdoc
      */
-    public static function finish($label = null)
+    public static function finish($labelOrFormat = null, $args = null, $_ = null)
     {
         if (self::$enabled) {
-            if ($label === null) {
-                $label = self::getCurrentFileHashLine(1);
+            if ($labelOrFormat === null) {
+                $labelOrFormat = self::getCurrentFileHashLine(1);
+                $args = null;
+                $_ = null;
             }
 
-            $profile = parent::finish($label);
+            $profile = parent::finish($labelOrFormat, $args, $_);
 
             if (self::$postProcessor === null) {
                 return $profile;

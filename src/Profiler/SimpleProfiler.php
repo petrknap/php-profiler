@@ -51,12 +51,21 @@ class SimpleProfiler
     /**
      * Start profiling
      *
-     * @param string $label
+     * @param string $labelOrFormat
+     * @param mixed $args [optional]
+     * @param mixed $_ [optional]
      * @return bool true on success or false on failure
      */
-    public static function start($label = null)
+    public static function start($labelOrFormat = null, $args = null, $_ = null)
     {
         if (self::$enabled) {
+            if ($args === null) {
+                $label = $labelOrFormat;
+            } else {
+                /** @noinspection SpellCheckingInspection */
+                $label = call_user_func_array("sprintf", func_get_args());
+            }
+
             $now = microtime(true);
             $memoryUsage = memory_get_usage(true);
 
@@ -80,10 +89,12 @@ class SimpleProfiler
     /**
      * Finish profiling and get result
      *
-     * @param string $label
+     * @param string $labelOrFormat
+     * @param mixed $args [optional]
+     * @param mixed $_ [optional]
      * @return Profile|bool profile on success or false on failure
      */
-    public static function finish($label = null)
+    public static function finish($labelOrFormat = null, $args = null, $_ = null)
     {
         if (self::$enabled) {
             $now = microtime(true);
@@ -91,6 +102,13 @@ class SimpleProfiler
 
             if (empty(self::$stack)) {
                 throw new \OutOfRangeException("Call " . __CLASS__ . "::start() first.");
+            }
+
+            if ($args === null) {
+                $label = $labelOrFormat;
+            } else {
+                /** @noinspection SpellCheckingInspection */
+                $label = call_user_func_array("sprintf", func_get_args());
             }
 
             /** @var Profile $profile */
