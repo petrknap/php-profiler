@@ -7,9 +7,6 @@ namespace PetrKnap\Php\Profiler;
  *
  * @author   Petr Knap <dev@petrknap.cz>
  * @since    2015-12-13
- * @category Debug
- * @package  PetrKnap\Php\Profiler
- * @version  0.7
  * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
  */
 class SimpleProfiler
