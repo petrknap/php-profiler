@@ -1,9 +1,11 @@
 <?php
 
+namespace PetrKnap\Php\Profiler\Test;
+
 use PetrKnap\Php\Profiler\Profile;
 use PetrKnap\Php\Profiler\SimpleProfiler;
 
-class SimpleProfilerTest extends PHPUnit_Framework_TestCase
+class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
@@ -121,7 +123,7 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
     {
         SimpleProfiler::start();
 
-        $largeObject = null;
+        $largeObject = new \Exception("Large object");
         for ($i = 0; $i < 1000; $i++) {
             SimpleProfiler::start();
             $largeObject = new \Exception("Large object", 0, $largeObject);
@@ -175,5 +177,14 @@ class SimpleProfilerTest extends PHPUnit_Framework_TestCase
         $diff = microtime(true) - $start;
 
         $this->assertLessThanOrEqual(0.002, $diff);
+    }
+
+    public function testLabelFormattingWorks()
+    {
+        SimpleProfiler::start("From %s#%s", __FILE__, __LINE__);
+        $profile = SimpleProfiler::finish("To %s#%s", __FILE__, __LINE__);
+
+        $this->assertEquals(sprintf("From %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::START_LABEL]);
+        $this->assertEquals(sprintf("To %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::FINISH_LABEL]);
     }
 }

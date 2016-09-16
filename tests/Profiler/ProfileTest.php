@@ -1,8 +1,10 @@
 <?php
 
+namespace PetrKnap\Php\Profiler\Test;
+
 use PetrKnap\Php\Profiler\Profile;
 
-class ProfileTest extends PHPUnit_Framework_TestCase
+class ProfileTest extends \PHPUnit_Framework_TestCase
 {
     private function getProfileAsArray(Profile $profile)
     {

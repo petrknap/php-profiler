@@ -1,9 +1,11 @@
 <?php
 
+namespace PetrKnap\Php\Profiler\Test;
+
 use PetrKnap\Php\Profiler\AdvancedProfiler;
 use PetrKnap\Php\Profiler\Profile;
 
-class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
+class AdvancedProfilerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
@@ -18,7 +20,7 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             sprintf(
                 "%s#%s",
                 __FILE__,
-                23
+                25
             ),
             AdvancedProfiler::getCurrentFileHashLine()
         );
@@ -36,7 +38,7 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             sprintf(
                 "%s#%s",
                 __FILE__,
-                32
+                34
             ),
             $result->meta[AdvancedProfiler::START_LABEL]
         );
@@ -45,7 +47,7 @@ class AdvancedProfilerTest extends PHPUnit_Framework_TestCase
             sprintf(
                 "%s#%s",
                 __FILE__,
-                33
+                35
             ),
             $result->meta[AdvancedProfiler::FINISH_LABEL]
         );
