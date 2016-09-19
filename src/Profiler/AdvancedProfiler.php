@@ -14,7 +14,7 @@ class AdvancedProfiler extends SimpleProfiler
     /**
      * @var callable
      */
-    private static $postProcessor = null;
+    protected static $postProcessor = null;
 
     /**
      * Set post processor
