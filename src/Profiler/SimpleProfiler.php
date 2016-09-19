@@ -49,6 +49,14 @@ class SimpleProfiler
     }
 
     /**
+     * @return bool true if profiler is enabled, otherwise false
+     */
+    public static function isEnabled()
+    {
+        return self::$enabled;
+    }
+
+    /**
      * Start profiling
      *
      * @param string $labelOrFormat
