@@ -36,6 +36,7 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
     {
         SimpleProfiler::enable();
 
+        $this->assertTrue(SimpleProfiler::isEnabled());
         $this->assertTrue(SimpleProfiler::start());
         $this->assertInstanceOf(get_class(new Profile()), SimpleProfiler::finish());
     }
@@ -44,6 +45,7 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
     {
         SimpleProfiler::disable();
 
+        $this->assertFalse(SimpleProfiler::isEnabled());
         $this->assertFalse(SimpleProfiler::start());
         $this->assertFalse(SimpleProfiler::finish());
     }
