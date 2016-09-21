@@ -30,35 +30,49 @@ PHP profiler by [Petr Knap].
 
 #### Usage
 
+If you wish to profile a block of code, simply encapsulate it between `SimpleProfiler::start` and `SimpleProfiler::finish` calls.
+
 ```php
-SimpleProfiler::enable();            // Enable profiler
-$img = Image::fromFile("./img.png"); // Do what you need to do before you start profiling
-SimpleProfiler::start();             // Start profiling where you wish to start profiling
-$img->rotate(180);                   // Do what you need to profile here
-$profile = SimpleProfiler::finish(); // Finish profiling where you wish to finish profiling
-unset($img);                         // Do what you need to do after you finish profiling
-var_dump($profile);                  // Process your profile here
+SimpleProfiler::enable();
+SimpleProfiler::start();
+/* your code goes here */
+processProfile(SimpleProfiler::finish());
+```
+
+If you wish, you can add labels to your profiles. The syntax is same as for `sprintf`.
+
+```php
+SimpleProfiler::start(/* sprintf( */ "static label" /* ) */);
+SimpleProfiler::start(/* sprintf( */ "line %s", __LINE__ /* ) */);
+```
+
+If you wish to create more detailed profiles, start new profile inside another one.
+
+```php
+SimpleProfiler::start("Profile 1");
+    /* your code goes here */
+    SimpleProfiler::start("Profile 1.1");
+        SimpleProfiler::start("Profile 1.1.1");
+            /* your code goes here */
+        SimpleProfiler::finish("Profile 1.1.1");
+        /* your code goes here */
+        SimpleProfiler::start("Profile 1.1.2");
+            /* your code goes here */
+        SimpleProfiler::finish("Profile 1.1.2");
+        /* your code goes here */
+    SimpleProfiler::finish("Profile 1.1");
+SimpleProfiler::finish("Profile 1");
 ```
 
 
 ### AdvancedProfiler
 
-[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`] and is developed dynamically. If you want to see an example of usage, then visit [`AdvancedProfilerTest`].
+[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`]. If you want to see an example of usage, then visit [`SimpleProfiler` section](#simpleprofiler).
 
 
 ## How to install
 
-Run `composer require petrknap/php-profiler` or merge this JSON code with your project `composer.json` file manually and run `composer install`. Instead of `dev-master` you can use [one of released versions].
-
-```json
-{
-    "require": {
-        "petrknap/php-profiler": "dev-master"
-    }
-}
-```
-
-Or manually clone this repository via `git clone https://github.com/petrknap/php-profiler.git` or download [this repository as ZIP] and extract files into your project.
+Run `composer require petrknap/php-profiler` in your project directory.
 
 
 
@@ -67,6 +81,3 @@ Or manually clone this repository via `git clone https://github.com/petrknap/php
 [`Profile`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/Profile.php
 [`SimpleProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/SimpleProfiler.php
 [`AdvancedProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/AdvancedProfiler.php
-[`AdvancedProfilerTest`]:https://github.com/petrknap/php-profiler/blob/master/tests/Profiler/AdvancedProfilerTest.php
-[one of released versions]:https://github.com/petrknap/php-profiler/releases
-[this repository as ZIP]:https://github.com/petrknap/php-profiler/archive/master.zip

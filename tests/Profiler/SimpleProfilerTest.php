@@ -2,6 +2,7 @@
 
 namespace PetrKnap\Php\Profiler\Test;
 
+use PetrKnap\Php\Profiler\Exception\EmptyStackException;
 use PetrKnap\Php\Profiler\Profile;
 use PetrKnap\Php\Profiler\SimpleProfiler;
 use PetrKnap\Php\Profiler\Test\SimpleProfilerTest\Profiler1;
@@ -29,7 +30,7 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyStack()
     {
-        $this->setExpectedException(get_class(new \LogicException()));
+        $this->setExpectedException(get_class(new EmptyStackException()));
 
         SimpleProfiler::finish();
     }

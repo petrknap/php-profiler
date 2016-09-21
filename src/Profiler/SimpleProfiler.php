@@ -1,6 +1,8 @@
 <?php
 
 namespace PetrKnap\Php\Profiler;
+use PetrKnap\Php\Profiler\Exception\EmptyStackException;
+use PetrKnap\Php\Profiler\Exception\ProfilerException;
 
 /**
  * Simple PHP class for profiling
@@ -100,7 +102,8 @@ class SimpleProfiler
      * @param string $labelOrFormat
      * @param mixed $args [optional]
      * @param mixed $_ [optional]
-     * @return Profile|bool profile on success or false on failure
+     * @return bool|Profile profile on success or false on failure
+     * @throws ProfilerException
      */
     public static function finish($labelOrFormat = null, $args = null, $_ = null)
     {
@@ -109,7 +112,7 @@ class SimpleProfiler
             $memoryUsage = memory_get_usage(true);
 
             if (empty(static::$stack)) {
-                throw new \LogicException("The stack is empty. Call " . get_called_class() . "::start() first.");
+                throw new EmptyStackException("The stack is empty. Call " . get_called_class() . "::start() first.");
             }
 
             if ($args === null) {
