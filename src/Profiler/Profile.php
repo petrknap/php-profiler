@@ -53,7 +53,10 @@ class Profile implements JsonSerializable
      */
     public $memoryUsageChange;
 
-    function jsonSerialize()
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
     {
         return array_merge(
             $this->meta,
