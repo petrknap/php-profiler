@@ -12,6 +12,16 @@ namespace PetrKnap\Php\Profiler;
 class AdvancedProfiler extends SimpleProfiler
 {
     /**
+     * @var bool
+     */
+    protected static $enabled = false;
+
+    /**
+     * @var Profile[]
+     */
+    protected static $stack = [];
+
+    /**
      * @var callable
      */
     protected static $postProcessor = null;
@@ -25,7 +35,7 @@ class AdvancedProfiler extends SimpleProfiler
      */
     public static function setPostProcessor(callable $postProcessor)
     {
-        self::$postProcessor = $postProcessor;
+        static::$postProcessor = $postProcessor;
     }
 
     /**
@@ -58,9 +68,9 @@ class AdvancedProfiler extends SimpleProfiler
      */
     public static function start($labelOrFormat = null, $args = null, $_ = null)
     {
-        if (self::$enabled) {
+        if (static::$enabled) {
             if ($labelOrFormat === null) {
-                $labelOrFormat = self::getCurrentFileHashLine(1);
+                $labelOrFormat = static::getCurrentFileHashLine(1);
                 $args = null;
                 $_ = null;
             }
@@ -76,20 +86,20 @@ class AdvancedProfiler extends SimpleProfiler
      */
     public static function finish($labelOrFormat = null, $args = null, $_ = null)
     {
-        if (self::$enabled) {
+        if (static::$enabled) {
             if ($labelOrFormat === null) {
-                $labelOrFormat = self::getCurrentFileHashLine(1);
+                $labelOrFormat = static::getCurrentFileHashLine(1);
                 $args = null;
                 $_ = null;
             }
 
             $profile = parent::finish($labelOrFormat, $args, $_);
 
-            if (self::$postProcessor === null) {
+            if (static::$postProcessor === null) {
                 return $profile;
             }
 
-            return call_user_func(self::$postProcessor, $profile);
+            return call_user_func(static::$postProcessor, $profile);
         }
 
         return false;

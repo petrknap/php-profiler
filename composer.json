@@ -6,8 +6,7 @@
     {
       "name": "Petr Knap",
       "email": "dev@petrknap.cz",
-      "homepage": "http://petrknap.cz",
-      "role": "Developer"
+      "homepage": "http://petrknap.cz"
     }
   ],
   "homepage": "https://github.com/petrknap/php-profiler",
@@ -28,12 +27,16 @@
       "sudo docker run -v $(pwd):/app --rm php:5.4-cli bash -c 'cd /app && php ./vendor/bin/phpunit'"
     ],
     "post-autoload-dump": [
-      "@test"
+      "@tests/"
     ]
   },
   "autoload": {
     "psr-4": {
-      "PetrKnap\\Php\\Profiler\\": "src/Profiler",
+      "PetrKnap\\Php\\Profiler\\": "src/Profiler"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "PetrKnap\\Php\\Profiler\\Test\\": "tests/Profiler"
     }
   }
