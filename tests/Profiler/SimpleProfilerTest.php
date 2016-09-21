@@ -4,6 +4,8 @@ namespace PetrKnap\Php\Profiler\Test;
 
 use PetrKnap\Php\Profiler\Profile;
 use PetrKnap\Php\Profiler\SimpleProfiler;
+use PetrKnap\Php\Profiler\Test\SimpleProfilerTest\Profiler1;
+use PetrKnap\Php\Profiler\Test\SimpleProfilerTest\Profiler2;
 
 class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 {
@@ -124,25 +126,21 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
     public function testMemoryProfiling()
     {
         SimpleProfiler::start();
-
+        SimpleProfiler::start();
         $largeObject = new \Exception("Large object");
         for ($i = 0; $i < 1000; $i++) {
-            SimpleProfiler::start();
             $largeObject = new \Exception("Large object", 0, $largeObject);
-            SimpleProfiler::finish();
         }
-
+        SimpleProfiler::finish();
         $result = SimpleProfiler::finish();
 
         $this->assertGreaterThan($result->meta[SimpleProfiler::START_MEMORY_USAGE], $result->meta[SimpleProfiler::FINISH_MEMORY_USAGE]);
         $this->assertGreaterThan($result->memoryUsageChange, $result->absoluteMemoryUsageChange);
         $this->assertGreaterThan(0, $result->absoluteMemoryUsageChange);
-        $this->assertGreaterThan(0, $result->memoryUsageChange);
+        $this->assertEquals(0, $result->memoryUsageChange);
 
         SimpleProfiler::start();
-
         unset($largeObject);
-
         $result = SimpleProfiler::finish();
 
         $this->assertLessThan($result->meta[SimpleProfiler::START_MEMORY_USAGE], $result->meta[SimpleProfiler::FINISH_MEMORY_USAGE]);
@@ -188,5 +186,36 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(sprintf("From %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::START_LABEL]);
         $this->assertEquals(sprintf("To %s#%s", __FILE__, __LINE__ - 3), $profile->meta[SimpleProfiler::FINISH_LABEL]);
+    }
+
+    public function testDifferentProfilersWorkIndependent()
+    {
+        Profiler1::enable();
+        Profiler2::disable();
+        $this->assertTrue(Profiler1::isEnabled());
+        $this->assertFalse(Profiler2::isEnabled());
+
+        Profiler1::disable();
+        Profiler2::enable();
+        $this->assertFalse(Profiler1::isEnabled());
+        $this->assertTrue(Profiler2::isEnabled());
+
+        Profiler1::enable();
+        Profiler2::enable();
+
+        Profiler1::start("S1");
+        Profiler2::start("S2");
+
+        $p1 = Profiler1::finish("F1");
+        $p2 = Profiler2::finish("F2");
+
+        $this->assertArraySubset([
+            Profiler1::START_LABEL => "S1",
+            Profiler1::FINISH_LABEL => "F1"
+        ], $p1->meta);
+        $this->assertArraySubset([
+            Profiler1::START_LABEL => "S2",
+            Profiler1::FINISH_LABEL => "F2"
+        ], $p2->meta);
     }
 }
