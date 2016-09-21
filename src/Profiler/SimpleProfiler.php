@@ -109,7 +109,7 @@ class SimpleProfiler
             $memoryUsage = memory_get_usage(true);
 
             if (empty(self::$stack)) {
-                throw new \OutOfRangeException("Call " . __CLASS__ . "::start() first.");
+                throw new \LogicException("The stack is empty. Call " . get_called_class() . "::start() first.");
             }
 
             if ($args === null) {

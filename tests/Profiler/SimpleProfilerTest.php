@@ -27,7 +27,7 @@ class SimpleProfilerTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyStack()
     {
-        $this->setExpectedException(get_class(new \OutOfRangeException()));
+        $this->setExpectedException(get_class(new \LogicException()));
 
         SimpleProfiler::finish();
     }
