@@ -30,14 +30,14 @@ class SimpleProfiler
     /**
      * @var Profile[]
      */
-    private static $stack = [];
+    protected static $stack = [];
 
     /**
      * Enable profiler
      */
     public static function enable()
     {
-        self::$enabled = true;
+        static::$enabled = true;
     }
 
     /**
@@ -45,7 +45,7 @@ class SimpleProfiler
      */
     public static function disable()
     {
-        self::$enabled = false;
+        static::$enabled = false;
     }
 
     /**
@@ -53,7 +53,7 @@ class SimpleProfiler
      */
     public static function isEnabled()
     {
-        return self::$enabled;
+        return static::$enabled;
     }
 
     /**
@@ -66,7 +66,7 @@ class SimpleProfiler
      */
     public static function start($labelOrFormat = null, $args = null, $_ = null)
     {
-        if (self::$enabled) {
+        if (static::$enabled) {
             if ($args === null) {
                 $label = $labelOrFormat;
             } else {
@@ -86,7 +86,7 @@ class SimpleProfiler
                 self::START_MEMORY_USAGE => $memoryUsage
             ];
 
-            array_push(self::$stack, $profile);
+            array_push(static::$stack, $profile);
 
             return true;
         }
@@ -104,11 +104,11 @@ class SimpleProfiler
      */
     public static function finish($labelOrFormat = null, $args = null, $_ = null)
     {
-        if (self::$enabled) {
+        if (static::$enabled) {
             $now = microtime(true);
             $memoryUsage = memory_get_usage(true);
 
-            if (empty(self::$stack)) {
+            if (empty(static::$stack)) {
                 throw new \LogicException("The stack is empty. Call " . get_called_class() . "::start() first.");
             }
 
@@ -120,7 +120,7 @@ class SimpleProfiler
             }
 
             /** @var Profile $profile */
-            $profile = array_pop(self::$stack);
+            $profile = array_pop(static::$stack);
             $profile->meta[self::FINISH_LABEL] = $label;
             $profile->meta[self::FINISH_TIME] = $now;
             $profile->meta[self::FINISH_MEMORY_USAGE] = $memoryUsage;
@@ -129,11 +129,11 @@ class SimpleProfiler
             $profile->absoluteMemoryUsageChange = $profile->meta[self::FINISH_MEMORY_USAGE] - $profile->meta[self::START_MEMORY_USAGE];
             $profile->memoryUsageChange = $profile->absoluteMemoryUsageChange - $profile->meta[self::MEMORY_USAGE_OFFSET];
 
-            if (!empty(self::$stack)) {
-                $timeOffset = &self::$stack[count(self::$stack) - 1]->meta[self::TIME_OFFSET];
+            if (!empty(static::$stack)) {
+                $timeOffset = &static::$stack[count(static::$stack) - 1]->meta[self::TIME_OFFSET];
                 $timeOffset = $timeOffset + $profile->absoluteDuration;
 
-                $memoryUsageOffset = &self::$stack[count(self::$stack) - 1]->meta[self::MEMORY_USAGE_OFFSET];
+                $memoryUsageOffset = &static::$stack[count(static::$stack) - 1]->meta[self::MEMORY_USAGE_OFFSET];
                 $memoryUsageOffset = $memoryUsageOffset + $profile->absoluteMemoryUsageChange;
             }
 
