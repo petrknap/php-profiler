@@ -1,0 +1,29 @@
+{
+    "description": "PHP profiler",
+    "require": {
+        "php": ">=5.5"
+    },
+    "WARNING": "This file is updated automatically. All keys will be overwritten, except of 'description' and 'require'.",
+    "name": "petrknap/php-profiler",
+    "homepage": "https://petrknap.github.io/php/profiler.html",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Petr Knap",
+            "email": "dev@petrknap.cz"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PetrKnap\\Php\\Profiler\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PetrKnap\\Php\\Profiler\\Test\\": "tests"
+        }
+    }
+}
