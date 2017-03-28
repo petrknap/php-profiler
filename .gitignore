@@ -1,5 +1,4 @@
 /.idea/
-/docs/_site/
 /vendor/
-/composer.lock
-/phpunit.log
+/*.lock
+/*.log

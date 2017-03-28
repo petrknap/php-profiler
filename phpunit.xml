@@ -6,7 +6,4 @@
             <exclude>vendor</exclude>
         </testsuite>
     </testsuites>
-    <logging>
-        <log type="testdox-text" target="./phpunit.log"/>
-    </logging>
 </phpunit>
