@@ -3,7 +3,7 @@
     "require": {
         "php": ">=5.5"
     },
-    "WARNING": "This file is updated automatically. All keys will be overwritten, except of 'description' and 'require'.",
+    "WARNING": "This file is updated automatically. All keys will be overwritten, except of 'description', 'require' and 'conflict'.",
     "name": "petrknap/php-profiler",
     "homepage": "https://petrknap.github.io/php/profiler.html",
     "license": "MIT",
