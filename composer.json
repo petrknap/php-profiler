@@ -19,7 +19,8 @@
     "autoload": {
         "psr-4": {
             "PetrKnap\\Php\\Profiler\\": "src"
-        }
+        },
+        "files": []
     },
     "autoload-dev": {
         "psr-4": {
