@@ -52,7 +52,7 @@ class AdvancedProfiler extends SimpleProfiler
         $backtrace = debug_backtrace();
         $backtrace = &$backtrace[$deep ? $deep : 0];
 
-        if ($backtrace) {
+        if ($backtrace && isset($backtrace["file"]) && isset($backtrace["line"])) {
             return sprintf(
                 "%s#%s",
                 $backtrace["file"],
