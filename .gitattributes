@@ -1,4 +1,11 @@
+/app            export-ignore
+/bin            export-ignore
 /tests          export-ignore
+/var            export-ignore
+/web            export-ignore
 /.gitattributes export-ignore
 /.gitignore     export-ignore
+/composer.lock  export-ignore
+/Dockerfile     export-ignore
+/Makefile       export-ignore
 /phpunit.xml    export-ignore
