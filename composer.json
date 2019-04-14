@@ -1,7 +1,7 @@
 {
     "description": "PHP profiler",
     "require": {
-        "php": ">=5.5"
+        "php": ">=5.6"
     },
     "WARNING": "This file is updated automatically. All keys will be overwritten, except of 'description', 'require' and 'conflict'.",
     "name": "petrknap/php-profiler",
