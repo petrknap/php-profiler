@@ -1,26 +1,17 @@
 <?php
 
-namespace PetrKnap\Php\Profiler;
+declare(strict_types=1);
+
+namespace PetrKnap\Profiler;
 
 interface ProfilerInterface
 {
     /**
-     * Start profiling
+     * @template TOutput of mixed
      *
-     * @param string $labelOrFormat
-     * @param mixed $args [optional]
-     * @param mixed $_ [optional]
-     * @return bool true on success or false on failure
-     */
-    public static function start($labelOrFormat = null, $args = null, $_ = null);
-
-    /**
-     * Finish profiling and get result
+     * @param callable(self): TOutput $callable
      *
-     * @param string $labelOrFormat
-     * @param mixed $args [optional]
-     * @param mixed $_ [optional]
-     * @return bool|Profile profile on success or false on failure
+     * @return ProcessableProfileInterface<TOutput> & ProfileWithOutputInterface<TOutput>
      */
-    public static function finish($labelOrFormat = null, $args = null, $_ = null);
+    public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface;
 }

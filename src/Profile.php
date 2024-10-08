@@ -1,116 +1,116 @@
 <?php
 
-namespace PetrKnap\Php\Profiler;
+declare(strict_types=1);
 
-use JsonSerializable;
-use PetrKnap\Php\Profiler\Exception\MissingProfilerException;
-use PetrKnap\Php\Profiler\Exception\ProfileException;
-use PetrKnap\Php\Profiler\Exception\UnsupportedProfilerException;
+namespace PetrKnap\Profiler;
+
+use PetrKnap\Optional\Optional;
+use PetrKnap\Optional\OptionalFloat;
+use PetrKnap\Optional\OptionalInt;
 
 /**
- * Profile
+ * @internal object can apply breaking changes within the same major version
  *
- * @author   Petr Knap <dev@petrknap.cz>
- * @since    2015-12-19
- * @license  https://github.com/petrknap/php-profiler/blob/master/LICENSE MIT
+ * @template TOutput of mixed
+ *
+ * @implements ProcessableProfileInterface<TOutput>
+ * @implements ProfileWithOutputInterface<TOutput>
  */
-class Profile implements JsonSerializable, ProfilerInterface
+final class Profile implements ProcessableProfileInterface, ProfileWithOutputInterface
 {
-    #region JSON keys
-    const ABSOLUTE_DURATION = "absolute_duration";
-    const DURATION = "duration";
-    const ABSOLUTE_MEMORY_USAGE_CHANGE = "absolute_memory_usage_change";
-    const MEMORY_USAGE_CHANGE = "memory_usage_change";
-    #endregion
+    private const MICROTIME_FORMAT = '%.6f';
 
+    private OptionalFloat $timeBefore;
+    private OptionalInt $memoryUsageBefore;
+    private OptionalFloat $timeAfter;
+    private OptionalInt $memoryUsageAfter;
     /**
-     * @var array
+     * @var array<ProfileInterface>
      */
-    public $meta = [];
+    private array $children = [];
+    /**
+     * @var Optional<Optional<TOutput|null>>
+     */
+    private Optional $outputOption;
 
-    /**
-     * Absolute duration in seconds
-     *
-     * @var float
-     */
-    public $absoluteDuration;
-
-    /**
-     * Duration in seconds
-     *
-     * @var float
-     */
-    public $duration;
-
-    /**
-     * Absolute memory usage change in bytes
-     *
-     * @var int
-     */
-    public $absoluteMemoryUsageChange;
-
-    /**
-     * Memory usage change in bytes
-     *
-     * @var int
-     */
-    public $memoryUsageChange;
-
-    /**
-     * @var string
-     */
-    protected static $profilerClassName;
-
-    /**
-     * @inheritdoc
-     */
-    public function jsonSerialize()
+    public function __construct()
     {
-        return array_merge(
-            $this->meta,
-            [
-                self::ABSOLUTE_DURATION => $this->absoluteDuration,
-                self::DURATION => $this->duration,
-                self::ABSOLUTE_MEMORY_USAGE_CHANGE => $this->absoluteMemoryUsageChange,
-                self::MEMORY_USAGE_CHANGE => $this->memoryUsageChange
-            ]
-        );
+        $this->timeBefore = OptionalFloat::empty();
+        $this->memoryUsageBefore = OptionalInt::empty();
+        $this->timeAfter = OptionalFloat::empty();
+        $this->memoryUsageAfter = OptionalInt::empty();
+        $this->outputOption = Optional::empty();
+    }
+
+    public function start(): void
+    {
+        $this->timeBefore = OptionalFloat::of(microtime(as_float: true));
+        $this->memoryUsageBefore = OptionalInt::of(memory_get_usage(real_usage: true));
+    }
+
+    public function finish(): void
+    {
+        $this->timeAfter = OptionalFloat::of(microtime(as_float: true));
+        $this->memoryUsageAfter = OptionalInt::of(memory_get_usage(real_usage: true));
+    }
+
+    public function process(callable $processor): mixed
+    {
+        $output = $this->getOutput();
+        $processor($this);
+
+        return $output;
     }
 
     /**
-     * @param string $profilerClassName
-     * @throws ProfileException
+     * @param TOutput $output
      */
-    public static function setProfiler($profilerClassName)
+    public function setOutput(mixed $output): void
     {
-        if (!class_exists($profilerClassName)) {
-            throw new MissingProfilerException("Class {$profilerClassName} not found");
-        }
-        if (!is_subclass_of($profilerClassName, ProfilerInterface::class) || is_subclass_of($profilerClassName, self::class)) {
-            throw new UnsupportedProfilerException("Class {$profilerClassName} is not supported");
-        }
-        static::$profilerClassName = $profilerClassName;
+        $this->outputOption = Optional::of(Optional::ofNullable($output));
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function start($labelOrFormat = null, $args = null, $_ = null)
+    public function getOutput(): mixed
     {
-        if (!static::$profilerClassName) {
-            throw new MissingProfilerException("Missing profiler");
-        }
-        return call_user_func_array([static::$profilerClassName, "start"], func_get_args());
+        /** @var TOutput */
+        return $this->outputOption->orElseThrow()->orElse(null);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function finish($labelOrFormat = null, $args = null, $_ = null)
+    public function addChild(ProfileInterface $child): void
     {
-        if (!static::$profilerClassName) {
-            throw new MissingProfilerException("Missing profiler");
+        $this->children[] = $child;
+    }
+
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    public function getDuration(): float
+    {
+        return $this->timeAfter->orElseThrow() - $this->timeBefore->orElseThrow();
+    }
+
+    public function getMemoryUsageChange(): int
+    {
+        return $this->memoryUsageAfter->orElseThrow() - $this->memoryUsageBefore->orElseThrow();
+    }
+
+    public function getMemoryUsages(): array
+    {
+        $memoryUsages = [
+            sprintf(self::MICROTIME_FORMAT, $this->timeBefore->orElseThrow()) => $this->memoryUsageBefore->orElseThrow(),
+            sprintf(self::MICROTIME_FORMAT, $this->timeAfter->orElseThrow()) => $this->memoryUsageAfter->orElseThrow(),
+        ];
+        foreach ($this->children as $child) {
+            $memoryUsages = array_merge(
+                $memoryUsages,
+                $child->getMemoryUsages(),
+            );
         }
-        return call_user_func_array([static::$profilerClassName, "finish"], func_get_args());
+
+        ksort($memoryUsages);
+
+        return $memoryUsages;
     }
 }
