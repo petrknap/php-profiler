@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace PetrKnap\Profiler;
 
-/**
- * @note it is recommended to use {@see ProfilerInterface}
- */
 final class Profiling
 {
     private bool $wasFinished = false;
 
     /**
-     * @param Profile<void> $profile
+     * @param Profile<mixed> $profile
      */
     private function __construct(
         private readonly Profile $profile,
@@ -40,5 +37,26 @@ final class Profiling
         $this->wasFinished = true;
 
         return $this->profile;
+    }
+
+    /**
+     * @throws Exception\ProfilingHasBeenAlreadyFinished
+     */
+    public function createNestedProfiler(): ProfilerInterface
+    {
+        if ($this->wasFinished) {
+            throw new Exception\ProfilingHasBeenAlreadyFinished();
+        }
+
+        return new class ($this->profile) extends Profiler {
+            /**
+             * @param Profile<mixed> $parentProfile
+             */
+            public function __construct(
+                Profile $parentProfile,
+            ) {
+                $this->parentProfile = $parentProfile;
+            }
+        };
     }
 }
