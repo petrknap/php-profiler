@@ -24,6 +24,7 @@ final class ReadmeTest extends TestCase implements MarkdownFileTestInterface
             'long-term-profiling' => '',
             'how-to-enable-disable-it' => 'It took 0.0 s to do something.' . 'something' . 'something',
             'cascade-profiling' => 'It took 0.0 s to do something.' . 'It took 0.0 s to do something before something and something, there are 1 children profiles.' . 'something',
+            'tick-listening' => 'There are 3 memory usage records.',
         ];
     }
 }
