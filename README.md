@@ -1,141 +1,74 @@
-# PHP profiler
+# PHP profiler for short-term & long-term profiling
 
-* [What is profiling?](#what-is-profiling)
-* [Components](#components)
-    * [Profile](#profile)
-        * [Usage](#usage)
-    * [SimpleProfiler](#simpleprofiler)
-    * [AdvancedProfiler](#advancedprofiler)
-* [How to install](#how-to-install)
+This tool allows you to monitor performance and detect memory leaks as well as inconsistent performance behavior of your application over time.
 
+## Short-term profiling
 
-## What is profiling?
-
-> In software engineering, **profiling** (*"program profiling"*, *"software profiling"*) is a form of dynamic program analysis that measures, for example, the space (memory) or time complexity of a program, the usage of particular instructions, or the frequency and duration of function calls. Most commonly, profiling information serves **to aid program optimization**.
--- [Profiling (computer programming) - Wikipedia, The Free Encyclopedia]
-
-
-## Components
-
-### Profile
-
-[`Profile`] is base data structure returned by profilers and wrapper for chosen one.
-
-#### Usage
-
-If you wish to profile a block of code, simply encapsulate it between `Profile::start` and `Profile::finish` calls.
+For **short-term profiling** you can use a [profiling helper](./src/Profiling.php).
+The [`Profiling`](./src/Profiling.php) will allow you to profile between `start` and `finish` methods calls.
 
 ```php
-<?php
+namespace PetrKnap\Profiler;
 
-use PetrKnap\Php\Profiler\Profile;
-use PetrKnap\Php\Profiler\SimpleProfiler;
+$profiling = Profiling::start();
+// do something
+$profile = $profiling->finish();
 
-SimpleProfiler::enable();
-Profile::setProfiler(SimpleProfiler::class);
-
-Profile::start();
-/* your code goes here */
-var_dump(Profile::finish());
+printf('It took %.1f s to do something.', $profile->getDuration());
 ```
 
-If you wish, you can add labels to your profiles. The syntax is same as for `sprintf`.
+The [`Profiling`](./src/Profiling.php) is simple - **cannot be turned on and off** easily.
+So a [profiler](./src/ProfilerInterface.php) was created for the purpose of hard-coded long-term profiling.
+
+## Long-term profiling
+
+Request a [profiler](./src/ProfilerInterface.php) as a dependency and call a `profile` method on it.
 
 ```php
-<?php
+namespace PetrKnap\Profiler;
 
-use PetrKnap\Php\Profiler\Profile;
-
-Profile::start(/* sprintf( */ "static label" /* ) */);
-Profile::start(/* sprintf( */ "line %s", __LINE__ /* ) */);
-```
-
-If you wish to create more detailed profiles, start new profile inside another one.
-
-```php
-<?php
-
-use PetrKnap\Php\Profiler\Profile;
-
-Profile::start("Profile 1");
-    /* your code goes here */
-    Profile::start("Profile 1.1");
-        Profile::start("Profile 1.1.1");
-            /* your code goes here */
-        Profile::finish("Profile 1.1.1");
-        /* your code goes here */
-        Profile::start("Profile 1.1.2");
-            /* your code goes here */
-        Profile::finish("Profile 1.1.2");
-        /* your code goes here */
-    Profile::finish("Profile 1.1");
-Profile::finish("Profile 1");
-```
-
-Or (if you wish) you can call `start` and `finish` methods directly on requested profiler.
-
-
-### SimpleProfiler
-
-[`SimpleProfiler`] is easy-to-use and quick static class for PHP code profiling. You can extend it and make your own specific profiler just for your use-case.
-
-```php
-<?php
-
-use PetrKnap\Php\Profiler\SimpleProfiler;
-
-SimpleProfiler::enable();
-
-SimpleProfiler::start();
-/* your code goes here */
-var_dump(SimpleProfiler::finish());
-```
-
-
-### AdvancedProfiler
-
-[`AdvancedProfiler`] is advanced version of [`SimpleProfiler`] with support for post processor.
-
-```php
-<?php
-
-use PetrKnap\Php\Profiler\AdvancedProfiler;
-use PetrKnap\Php\Profiler\Profile;
-
-AdvancedProfiler::setPostProcessor(function(Profile $profile) {
-    var_dump($profile);
-});
-AdvancedProfiler::enable();
-
-AdvancedProfiler::start();
-/* your code goes here */
-AdvancedProfiler::finish();
-```
-
-
-## How to install
-
-Run `composer require petrknap/php-profiler` or merge this JSON code with your project `composer.json` file manually and run `composer install`. Instead of `dev-master` you can use [one of released versions].
-
-```json
-{
-    "require": {
-        "petrknap/php-profiler": "dev-master"
-    }
+function something(ProfilerInterface $profiler): string {
+    // do something without profiling
+    return $profiler->profile(function (): string {
+        // do something
+        return 'something';
+    })->process(fn (ProfileInterface $profile) => printf(
+        'It took %.1f s to do something.',
+        $profile->getDuration(),
+    ));
 }
 ```
 
-Or manually clone this repository via `git clone https://github.com/petrknap/php-profiler.git` or download [this repository as ZIP] and extract files into your project.
+### How to enable / disable it
 
+It can be easily enabled, or disabled **through the DI**, which provides either the [`Profiler`](./src/Profiler.php) or the [`NullProfiler`](./src/NullProfiler.php).
 
+```php
+namespace PetrKnap\Profiler;
 
-[one of released versions]:https://github.com/petrknap/php-profiler/releases
-[this repository as ZIP]:https://github.com/petrknap/php-profiler/archive/master.zip
+echo something(new Profiler());
+echo something(new NullProfiler());
+```
 
+### Cascade profiling
 
+The `profile` method provides you a nested [profiler](./src/ProfilerInterface.php) that you can use for more detailed cascade profiling.
 
+```php
+namespace PetrKnap\Profiler;
 
-[Profiling (computer programming) - Wikipedia, The Free Encyclopedia]:https://en.wikipedia.org/w/index.php?title=Profiling_(computer_programming)&oldid=697419059
-[`Profile`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/Profile.php
-[`SimpleProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/SimpleProfiler.php
-[`AdvancedProfiler`]:https://github.com/petrknap/php-profiler/blob/master/src/Profiler/AdvancedProfiler.php
+echo (new Profiler())->profile(function (ProfilerInterface $profiler): string {
+    // do something before something
+    return something($profiler);
+})->process(fn (ProfileInterface $profile) => printf(
+    'It took %.1f s to do something before something and something, there are %d children profiles.',
+    $profile->getDuration(),
+    count($profile->getChildren()),
+));
+```
+
+---
+
+Run `composer require petrknap/profiler` to install it.
+You can [support this project via donation](https://petrknap.github.io/donate.html).
+The project is licensed under [the terms of the `LGPL-3.0-or-later`](./COPYING.LESSER).

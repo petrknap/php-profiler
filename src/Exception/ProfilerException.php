@@ -1,8 +1,11 @@
 <?php
 
-namespace PetrKnap\Php\Profiler\Exception;
+declare(strict_types=1);
 
-abstract class ProfilerException extends \Exception
+namespace PetrKnap\Profiler\Exception;
+
+use Throwable;
+
+interface ProfilerException extends Throwable
 {
-    // Empty class
 }

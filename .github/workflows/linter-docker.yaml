@@ -1,0 +1,17 @@
+name: Docker Linter
+
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - '**/Dockerfile'
+      - '**.dockerfile'
+
+jobs:
+  HaskellDockerfileLinter:
+    runs-on: ubuntu-latest
+    container:
+      image: hadolint/hadolint:latest-alpine
+    steps:
+      - uses: actions/checkout@v3
+      - run: find . -name 'Dockerfile' -or -name '*.dockerfile' | xargs -trn 1 hadolint
