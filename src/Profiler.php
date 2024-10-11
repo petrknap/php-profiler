@@ -13,23 +13,14 @@ namespace PetrKnap\Profiler;
 
     public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
     {
-        $profile = new Profile();
-
-        $profile->start();
-        $output = $callable(new class ($profile) extends Profiler {
-            /**
-             * @param Profile<mixed> $parentProfile
-             */
-            public function __construct(Profile $parentProfile)
-            {
-                $this->parentProfile = $parentProfile;
-            }
-        });
-        $profile->finish();
+        $profiling = Profiling::start();
+        $output = $callable($profiling->createNestedProfiler());
+        /** @var Profile<mixed> $profile */
+        $profile = $profiling->finish();
         $profile->setOutput($output);
 
         $this->parentProfile?->addChild($profile);
 
-        return $profile;
+        return $profile; // @phpstan-ignore return.type
     }
 }
