@@ -20,6 +20,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
 {
     private const MICROTIME_FORMAT = '%.6f';
 
+    private ProfileState $state;
     private OptionalFloat $timeBefore;
     private OptionalInt $memoryUsageBefore;
     private OptionalFloat $timeAfter;
@@ -35,6 +36,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
 
     public function __construct()
     {
+        $this->state = ProfileState::Created;
         $this->timeBefore = OptionalFloat::empty();
         $this->memoryUsageBefore = OptionalInt::empty();
         $this->timeAfter = OptionalFloat::empty();
@@ -42,20 +44,37 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
         $this->outputOption = Optional::empty();
     }
 
+    /**
+     * @throws Exception\ProfileCouldNotBeStarted
+     */
     public function start(): void
     {
+        Exception\ProfileCouldNotBeStarted::throwIf($this->state !== ProfileState::Created);
+
+        $this->state = ProfileState::Started;
         $this->timeBefore = OptionalFloat::of(microtime(as_float: true));
         $this->memoryUsageBefore = OptionalInt::of(memory_get_usage(real_usage: true));
     }
 
+    /**
+     * @throws Exception\ProfileCouldNotBeFinished
+     */
     public function finish(): void
     {
+        Exception\ProfileCouldNotBeFinished::throwIf($this->state !== ProfileState::Started);
+
+        $this->state = ProfileState::Finished;
         $this->timeAfter = OptionalFloat::of(microtime(as_float: true));
         $this->memoryUsageAfter = OptionalInt::of(memory_get_usage(real_usage: true));
     }
 
+    /**
+     * @throws Exception\ProfileCouldNotBeProcessed
+     */
     public function process(callable $processor): mixed
     {
+        Exception\ProfileCouldNotBeProcessed::throwIf($this->state !== ProfileState::Finished);
+
         $output = $this->getOutput();
         $processor($this);
 

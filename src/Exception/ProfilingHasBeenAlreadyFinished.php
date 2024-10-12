@@ -8,4 +8,5 @@ use LogicException;
 
 final class ProfilingHasBeenAlreadyFinished extends LogicException implements ProfilerException
 {
+    use ThrowIf;
 }
