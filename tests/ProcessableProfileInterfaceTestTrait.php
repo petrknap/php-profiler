@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PetrKnap\Profiler;
 
-use Exception;
 use PetrKnap\Optional\Exception\CouldNotGetValueOfEmptyOptional;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -35,9 +34,9 @@ trait ProcessableProfileInterfaceTestTrait
      * @note internal issue
      */
     #[DataProvider('dataThrowsOnUnprocessableProfile')]
-    public function testThrowsOnUnprocessableProfile(ProcessableProfileInterface $unprocessableProfile): void
+    public function testThrowsOnUnprocessableProfile(ProcessableProfileInterface $unprocessableProfile, string $expectedException): void
     {
-        self::expectException(CouldNotGetValueOfEmptyOptional::class);
+        self::expectException($expectedException);
 
         $unprocessableProfile->process(fn () => null);
     }
@@ -50,9 +49,9 @@ trait ProcessableProfileInterfaceTestTrait
         $outputless->start();
         $outputless->finish();
         return [
-            'unstarted' => [new Profile()],
-            'unfinished' => [$unfinished],
-            'outputless' => [$outputless],
+            'unstarted' => [new Profile(), Exception\ProfileCouldNotBeProcessed::class],
+            'unfinished' => [$unfinished, Exception\ProfileCouldNotBeProcessed::class],
+            'outputless' => [$outputless, CouldNotGetValueOfEmptyOptional::class],
         ];
     }
 
@@ -62,7 +61,7 @@ trait ProcessableProfileInterfaceTestTrait
         $profile->start();
         $profile->finish();
         $profile->setOutput(null);
-        $expectedException = new Exception();
+        $expectedException = new \Exception();
 
         self::expectExceptionObject($expectedException);
 

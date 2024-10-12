@@ -29,9 +29,7 @@ final class Profiling
      */
     public function finish(): ProfileInterface
     {
-        if ($this->wasFinished) {
-            throw new Exception\ProfilingHasBeenAlreadyFinished();
-        }
+        Exception\ProfilingHasBeenAlreadyFinished::throwIf($this->wasFinished);
 
         $this->profile->finish();
         $this->wasFinished = true;
@@ -44,9 +42,7 @@ final class Profiling
      */
     public function createNestedProfiler(): ProfilerInterface
     {
-        if ($this->wasFinished) {
-            throw new Exception\ProfilingHasBeenAlreadyFinished();
-        }
+        Exception\ProfilingHasBeenAlreadyFinished::throwIf($this->wasFinished);
 
         return new class ($this->profile) extends Profiler {
             /**
