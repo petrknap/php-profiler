@@ -39,9 +39,12 @@ final class Profiling
         return $this->profile;
     }
 
-    public function createNestedProfiler(): ProfilerInterface
+    /**
+     * @internal should be used only by {@see Profiler::profile()}
+     */
+    public static function createNestedProfiler(Profiling $profiling): ProfilerInterface
     {
-        return new class ($this->profile) extends Profiler {
+        return new class ($profiling->profile) extends Profiler {
             /**
              * @param Profile<mixed> $parentProfile
              */

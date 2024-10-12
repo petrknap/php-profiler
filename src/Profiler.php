@@ -14,7 +14,7 @@ namespace PetrKnap\Profiler;
     public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
     {
         $profiling = Profiling::start();
-        $output = $callable($profiling->createNestedProfiler());
+        $output = $callable(Profiling::createNestedProfiler($profiling));
         /** @var Profile<mixed> $profile */
         $profile = $profiling->finish();
         $profile->setOutput($output);
