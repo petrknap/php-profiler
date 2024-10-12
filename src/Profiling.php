@@ -6,8 +6,6 @@ namespace PetrKnap\Profiler;
 
 final class Profiling
 {
-    private bool $wasFinished = false;
-
     /**
      * @param Profile<mixed> $profile
      */
@@ -29,22 +27,21 @@ final class Profiling
      */
     public function finish(): ProfileInterface
     {
-        Exception\ProfilingHasBeenAlreadyFinished::throwIf($this->wasFinished);
+        try {
+            $this->profile->finish();
 
-        $this->profile->finish();
-        $this->wasFinished = true;
-
-        return $this->profile;
+            return $this->profile;
+        } catch (Exception\ProfileException $profileException) {
+            throw new Exception\ProfilingHasBeenAlreadyFinished(previous: $profileException);
+        }
     }
 
     /**
-     * @throws Exception\ProfilingHasBeenAlreadyFinished
+     * @internal should be used only by {@see Profiler::profile()}
      */
-    public function createNestedProfiler(): ProfilerInterface
+    public static function createNestedProfiler(Profiling $profiling): ProfilerInterface
     {
-        Exception\ProfilingHasBeenAlreadyFinished::throwIf($this->wasFinished);
-
-        return new class ($this->profile) extends Profiler {
+        return new class ($profiling->profile) extends Profiler {
             /**
              * @param Profile<mixed> $parentProfile
              */
@@ -52,6 +49,15 @@ final class Profiling
                 Profile $parentProfile,
             ) {
                 $this->parentProfile = $parentProfile;
+            }
+
+            public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
+            {
+                if ($this->parentProfile?->getState() !== ProfileState::Started) {
+                    throw new Exception\ParentProfileIsNotStarted();
+                }
+
+                return parent::profile($callable);
             }
         };
     }

@@ -6,6 +6,6 @@ namespace PetrKnap\Profiler\Exception;
 
 use Throwable;
 
-interface ProfileException extends Throwable
+interface ProfilingException extends Throwable
 {
 }

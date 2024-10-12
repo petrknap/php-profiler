@@ -6,7 +6,10 @@ namespace PetrKnap\Profiler\Exception;
 
 use LogicException;
 
-final class ProfilingHasBeenAlreadyFinished extends LogicException implements ProfilerException
+/**
+ * @todo rename to `ProfilingCouldNotBeFinished`
+ * @todo remove implementation of {@see ProfilerException}
+ */
+final class ProfilingHasBeenAlreadyFinished extends LogicException implements ProfilerException, ProfilingException
 {
-    use ThrowIf;
 }

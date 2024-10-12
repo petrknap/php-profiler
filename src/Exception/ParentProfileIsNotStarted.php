@@ -9,6 +9,6 @@ use LogicException;
 /**
  * @internal exception should never be thrown out
  */
-final class ProfileCouldNotBeStarted extends LogicException implements ProfileException
+final class ParentProfileIsNotStarted extends LogicException implements ProfilerException
 {
 }
