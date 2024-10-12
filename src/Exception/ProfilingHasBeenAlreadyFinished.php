@@ -7,6 +7,7 @@ namespace PetrKnap\Profiler\Exception;
 use LogicException;
 
 /**
+ * @todo rename to `ProfilingCouldNotBeFinished`
  * @todo remove implementation of {@see ProfilerException}
  */
 final class ProfilingHasBeenAlreadyFinished extends LogicException implements ProfilerException, ProfilingException
