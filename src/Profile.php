@@ -44,6 +44,11 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
         $this->outputOption = Optional::empty();
     }
 
+    public function getState(): ProfileState
+    {
+        return $this->state;
+    }
+
     /**
      * @throws Exception\ProfileCouldNotBeStarted
      */
