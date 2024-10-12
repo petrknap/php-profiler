@@ -7,9 +7,8 @@ namespace PetrKnap\Profiler\Exception;
 use LogicException;
 
 /**
- * @internal object can apply breaking changes within the same major version
+ * @internal exception should never be thrown out
  */
 final class ProfileCouldNotBeStarted extends LogicException implements ProfileException
 {
-    use ThrowIf;
 }

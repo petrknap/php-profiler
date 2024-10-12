@@ -49,7 +49,9 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      */
     public function start(): void
     {
-        Exception\ProfileCouldNotBeStarted::throwIf($this->state !== ProfileState::Created);
+        if ($this->state !== ProfileState::Created) {
+            throw new Exception\ProfileCouldNotBeStarted();
+        }
 
         $this->state = ProfileState::Started;
         $this->timeBefore = OptionalFloat::of(microtime(as_float: true));
@@ -61,7 +63,9 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      */
     public function finish(): void
     {
-        Exception\ProfileCouldNotBeFinished::throwIf($this->state !== ProfileState::Started);
+        if ($this->state !== ProfileState::Started) {
+            throw new Exception\ProfileCouldNotBeFinished();
+        }
 
         $this->state = ProfileState::Finished;
         $this->timeAfter = OptionalFloat::of(microtime(as_float: true));
@@ -73,7 +77,9 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      */
     public function process(callable $processor): mixed
     {
-        Exception\ProfileCouldNotBeProcessed::throwIf($this->state !== ProfileState::Finished);
+        if ($this->state !== ProfileState::Finished) {
+            throw new Exception\ProfileCouldNotBeProcessed();
+        }
 
         $output = $this->getOutput();
         $processor($this);

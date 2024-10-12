@@ -7,7 +7,7 @@ namespace PetrKnap\Profiler\Exception;
 use Throwable;
 
 /**
- * @internal interface can apply breaking changes within the same major version
+ * @internal exception should never be thrown out
  */
 interface ProfileException extends Throwable
 {
