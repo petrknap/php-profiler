@@ -46,18 +46,20 @@ final class Profiling
              * @param Profile<mixed> $parentProfile
              */
             public function __construct(
-                Profile $parentProfile,
+                private readonly Profile $parentProfile,
             ) {
-                $this->parentProfile = $parentProfile;
             }
 
             public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
             {
-                if ($this->parentProfile?->getState() !== ProfileState::Started) {
+                if ($this->parentProfile->getState() !== ProfileState::Started) {
                     throw new Exception\ParentProfileIsNotStarted();
                 }
 
-                return parent::profile($callable);
+                $profile = parent::profile($callable);
+                $this->parentProfile->addChild($profile);
+
+                return $profile;
             }
         };
     }
