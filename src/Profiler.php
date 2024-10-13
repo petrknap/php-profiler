@@ -16,4 +16,9 @@ namespace PetrKnap\Profiler;
 
         return $profile; // @phpstan-ignore return.type
     }
+
+    public function record(string $type, mixed $data): void
+    {
+        throw new Exception\ProfilerCouldNotRecordData();
+    }
 }

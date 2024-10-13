@@ -43,6 +43,15 @@ final class NullProfiler implements ProfilerInterface
             {
                 return [];
             }
+
+            public function getRecords(string $of): array
+            {
+                return [];
+            }
         };
+    }
+
+    public function record(string $type, mixed $data): void
+    {
     }
 }
