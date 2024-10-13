@@ -19,6 +19,7 @@ use PetrKnap\Optional\OptionalInt;
 final class Profile implements ProcessableProfileInterface, ProfileWithOutputInterface
 {
     private const MICROTIME_FORMAT = '%.6f';
+    private const SORTED_BY_TIME = true;
 
     private ProfileState $state;
     private OptionalFloat $timeBefore;
@@ -126,21 +127,41 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
         return $this->memoryUsageAfter->orElseThrow() - $this->memoryUsageBefore->orElseThrow();
     }
 
-    public function getMemoryUsages(): array
+    public function getMemoryUsages(bool $sortedByTime = self::SORTED_BY_TIME): array
     {
-        $memoryUsages = [
-            sprintf(self::MICROTIME_FORMAT, $this->timeBefore->orElseThrow()) => $this->memoryUsageBefore->orElseThrow(),
-            sprintf(self::MICROTIME_FORMAT, $this->timeAfter->orElseThrow()) => $this->memoryUsageAfter->orElseThrow(),
-        ];
-        foreach ($this->children as $child) {
-            $memoryUsages = array_merge(
-                $memoryUsages,
-                $child->getMemoryUsages(),
-            );
+        return self::expandRecords(
+            [
+                sprintf(self::MICROTIME_FORMAT, $this->timeBefore->orElseThrow()) => $this->memoryUsageBefore->orElseThrow(),
+                sprintf(self::MICROTIME_FORMAT, $this->timeAfter->orElseThrow()) => $this->memoryUsageAfter->orElseThrow(),
+            ],
+            $this->children,
+            __FUNCTION__,
+            sortedByKey: $sortedByTime,
+        );
+    }
+
+    /**
+     * @template TRecord of mixed
+     *
+     * @param array<numeric-string, TRecord> $myRecords
+     * @param array<ProfileInterface> $myChildren
+     *
+     * @return array<numeric-string, TRecord>
+     */
+    private static function expandRecords(array $myRecords, array $myChildren, string $__function__, bool $sortedByKey = false): array
+    {
+        $expandedRecords = array_merge(
+            $myRecords,
+            ...array_map(
+                static fn (ProfileInterface $child): array => call_user_func([$child, $__function__], false), // @phpstan-ignore argument.type, return.type
+                $myChildren,
+            )
+        );
+
+        if ($sortedByKey) {
+            ksort($expandedRecords);
         }
 
-        ksort($memoryUsages);
-
-        return $memoryUsages;
+        return $expandedRecords;
     }
 }
