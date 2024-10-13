@@ -61,6 +61,15 @@ final class Profiling
 
                 return $profile;
             }
+
+            public function record(string $type, mixed $data): void
+            {
+                try {
+                    $this->parentProfile->addRecord($type, $data);
+                } catch (Exception\ProfileException $profileException) {
+                    throw new Exception\ProfilerCouldNotRecordData(previous: $profileException);
+                }
+            }
         };
     }
 }

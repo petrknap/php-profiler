@@ -67,6 +67,23 @@ echo (new Profiler())->profile(function (ProfilerInterface $profiler): string {
 ));
 ```
 
+### Recording custom data
+
+A [profiler](./src/ProfilerInterface.php) provides the `record` method to record custom data in a [profile](./src/ProfileInterface.php).
+
+```php
+namespace PetrKnap\Profiler;
+
+$profile = (new Profiler())->profile(function (ProfilerInterface $profiler): void {
+    for ($i = 0; $i < 5; $i++) {
+        $profiler->record('main_loop', $i);
+    }
+    $profiler->record('main_loop', 'done');
+});
+
+echo implode(' -> ', $profile->getRecords('main_loop'));
+```
+
 ---
 
 Run `composer require petrknap/profiler` to install it.

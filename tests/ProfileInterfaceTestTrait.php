@@ -56,4 +56,21 @@ trait ProfileInterfaceTestTrait
         self::assertEquals(2, array_shift($memoryUsages));
         self::assertEquals(3, array_shift($memoryUsages));
     }
+
+    public function testRecordsDataOfCustomType(): void
+    {
+        $profile = new Profile();
+        $profile->addRecord('a', 'a1');
+        $profile->addRecord('b', 'b1');
+        $profile->addRecord('a', 'a2');
+
+        self::assertSame(
+            ['a1', 'a2'],
+            array_values($profile->getRecords('a')),
+        );
+        self::assertSame(
+            ['b1'],
+            array_values($profile->getRecords('b')),
+        );
+    }
 }

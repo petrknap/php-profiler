@@ -7,6 +7,7 @@ namespace PetrKnap\Profiler;
 use PetrKnap\Optional\Optional;
 use PetrKnap\Optional\OptionalFloat;
 use PetrKnap\Optional\OptionalInt;
+use PetrKnap\Shorts\ArrayShorts;
 
 /**
  * @internal object can apply breaking changes within the same major version
@@ -26,6 +27,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
     private OptionalInt $memoryUsageBefore;
     private OptionalFloat $timeAfter;
     private OptionalInt $memoryUsageAfter;
+
     /**
      * @var array<ProfileInterface>
      */
@@ -34,6 +36,11 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      * @var Optional<Optional<TOutput|null>>
      */
     private Optional $outputOption;
+
+    /**
+     * @var array<string, array<numeric-string, mixed>>
+     */
+    private array $records = [];
 
     public function __construct()
     {
@@ -136,6 +143,25 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
             ],
             $this->children,
             __FUNCTION__,
+            [false],
+            sortedByKey: $sortedByTime,
+        );
+    }
+
+    public function addRecord(string $type, mixed $data): void
+    {
+        $records = $this->records[$type] ?? [];
+        $records[sprintf(self::MICROTIME_FORMAT, microtime(as_float: true))] = $data;
+        $this->records[$type] = $records;
+    }
+
+    public function getRecords(string $type, bool $sortedByTime = self::SORTED_BY_TIME): array
+    {
+        return self::expandRecords(
+            $this->records[$type] ?? [],
+            $this->children,
+            __FUNCTION__,
+            [$type, false],
             sortedByKey: $sortedByTime,
         );
     }
@@ -145,15 +171,21 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      *
      * @param array<numeric-string, TRecord> $myRecords
      * @param array<ProfileInterface> $myChildren
+     * @param array<mixed> $args
      *
      * @return array<numeric-string, TRecord>
      */
-    private static function expandRecords(array $myRecords, array $myChildren, string $__function__, bool $sortedByKey = false): array
-    {
+    private static function expandRecords(
+        array $myRecords,
+        array $myChildren,
+        string $__function__,
+        array $args,
+        bool $sortedByKey = false
+    ): array {
         $expandedRecords = array_merge(
             $myRecords,
             ...array_map(
-                static fn (ProfileInterface $child): array => call_user_func([$child, $__function__], false), // @phpstan-ignore argument.type, return.type
+                static fn (ProfileInterface $child): array => call_user_func_array([$child, $__function__], $args), // @phpstan-ignore argument.type, return.type
                 $myChildren,
             )
         );
