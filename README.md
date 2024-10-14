@@ -27,7 +27,7 @@ Request a [profiler](./src/ProfilerInterface.php) as a dependency and call a `pr
 ```php
 namespace PetrKnap\Profiler;
 
-function something(ProfilerInterface $profiler): string {
+function doSomething(ProfilerInterface $profiler): string {
     // do something without profiling
     return $profiler->profile(function (): string {
         // do something
@@ -46,8 +46,8 @@ It can be easily enabled, or disabled **through the DI**, which provides either 
 ```php
 namespace PetrKnap\Profiler;
 
-echo something(new Profiler());
-echo something(new NullProfiler());
+echo doSomething(new Profiler());
+echo doSomething(new NullProfiler());
 ```
 
 ### Cascade profiling
@@ -59,12 +59,29 @@ namespace PetrKnap\Profiler;
 
 echo (new Profiler())->profile(function (ProfilerInterface $profiler): string {
     // do something before something
-    return something($profiler);
+    return doSomething($profiler);
 })->process(fn (ProfileInterface $profile) => printf(
     'It took %.1f s to do something before something and something, there are %d children profiles.',
     $profile->getDuration(),
     count($profile->getChildren()),
 ));
+```
+
+### Tick listening
+
+For greater precision, you can use measurements at each `N` tick.
+This will result in **very detailed code tracking**, which can degrade the performance of the monitored application.
+
+```php
+declare(ticks=3); // this declaration is important (N=3)
+
+namespace PetrKnap\Profiler;
+
+$profiling = Profiling::start(listenToTicks: true);
+doSomething(new NullProfiler());
+$profile = $profiling->finish();
+
+printf('There are %d memory usage records.', count($profile->getMemoryUsages()));
 ```
 
 ---

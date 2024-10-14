@@ -11,15 +11,17 @@ final class Profiling
      */
     private function __construct(
         private readonly Profile $profile,
+        private readonly bool $listenToTicks,
     ) {
     }
 
-    public static function start(): self
-    {
-        $profile = new Profile();
+    public static function start(
+        bool $listenToTicks = Profile::DO_NOT_LISTEN_TO_TICKS,
+    ): self {
+        $profile = new Profile($listenToTicks);
         $profile->start();
 
-        return new self($profile);
+        return new self($profile, $listenToTicks);
     }
 
     /**
@@ -41,13 +43,17 @@ final class Profiling
      */
     public static function createNestedProfiler(Profiling $profiling): ProfilerInterface
     {
-        return new class ($profiling->profile) extends Profiler {
+        return new class ($profiling->profile, $profiling->listenToTicks) extends Profiler {
             /**
              * @param Profile<mixed> $parentProfile
              */
             public function __construct(
                 private readonly Profile $parentProfile,
+                bool $listenToTicks,
             ) {
+                parent::__construct(
+                    listenToTicks: $listenToTicks,
+                );
             }
 
             public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
@@ -56,10 +62,15 @@ final class Profiling
                     throw new Exception\ParentProfileIsNotStarted();
                 }
 
-                $profile = parent::profile($callable);
-                $this->parentProfile->addChild($profile);
+                $this->parentProfile->unregisterTickHandler();
+                try {
+                    $profile = parent::profile($callable);
+                    $this->parentProfile->addChild($profile);
 
-                return $profile;
+                    return $profile;
+                } finally {
+                    $this->parentProfile->registerTickHandler();
+                }
             }
         };
     }
