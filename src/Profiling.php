@@ -27,15 +27,23 @@ final class Profiling
     /**
      * @throws Exception\ProfilingHasBeenAlreadyFinished
      */
+    public function touch(): void
+    {
+        $this->checkProfileState();
+
+        $this->profile->tickHandler();
+    }
+
+    /**
+     * @throws Exception\ProfilingHasBeenAlreadyFinished
+     */
     public function finish(): ProfileInterface
     {
-        try {
-            $this->profile->finish();
+        $this->checkProfileState();
 
-            return $this->profile;
-        } catch (Exception\ProfileException $profileException) {
-            throw new Exception\ProfilingHasBeenAlreadyFinished(previous: $profileException);
-        }
+        $this->profile->finish();
+
+        return $this->profile;
     }
 
     /**
@@ -73,5 +81,15 @@ final class Profiling
                 }
             }
         };
+    }
+
+    /**
+     * @throws Exception\ProfilingHasBeenAlreadyFinished
+     */
+    private function checkProfileState(): void
+    {
+        if ($this->profile->getState() === ProfileState::Finished) {
+            throw new Exception\ProfilingHasBeenAlreadyFinished();
+        }
     }
 }

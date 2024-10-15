@@ -20,11 +20,12 @@ final class ReadmeTest extends TestCase implements MarkdownFileTestInterface
     public static function getExpectedOutputsOfPhpExamples(): iterable
     {
         return [
-            'short-term-profiling' => 'It took 0.0 s to do something.',
-            'long-term-profiling' => '',
+            'basic-profiling' => 'It took 0.0 s to do something.',
+            'complex-profiling' => '',
             'how-to-enable-disable-it' => 'It took 0.0 s to do something.' . 'something' . 'something',
-            'cascade-profiling' => 'It took 0.0 s to do something.' . 'It took 0.0 s to do something before something and something, there are 1 children profiles.' . 'something',
+            'touching-profile' => 'There are 3 memory usage records.',
             'tick-listening' => 'There are 3 memory usage records.',
+            'cascade-profiling' => 'There are 4 memory usage records.',
         ];
     }
 }
