@@ -78,7 +78,7 @@ declare(ticks=2); // this declaration is important (N=2)
 
 namespace PetrKnap\Profiler;
 
-$profiling = Profiling::start(listenToTicks: true);
+$profiling = Profiling::start(snapshotOnTick: true);
 (fn () => 'something')();
 $profile = $profiling->finish();
 

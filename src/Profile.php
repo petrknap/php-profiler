@@ -18,13 +18,13 @@ use PetrKnap\Optional\OptionalInt;
  */
 final class Profile implements ProcessableProfileInterface, ProfileWithOutputInterface
 {
-    public const DO_NOT_LISTEN_TO_TICKS = false;
+    public const DO_NOT_SNAPSHOT_ON_TICK = false;
 
     private const MICROTIME_FORMAT = '%.6f';
     private const SORTED_BY_TIME = true;
 
     private ProfileState $state;
-    private bool|null $isListeningToTicks;
+    private bool|null $isSnapshotingOnTick;
     private OptionalFloat $timeBefore;
     private OptionalInt $memoryUsageBefore;
     private OptionalFloat $timeAfter;
@@ -43,10 +43,10 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
     private Optional $outputOption;
 
     public function __construct(
-        bool $listenToTicks = self::DO_NOT_LISTEN_TO_TICKS,
+        bool $snapshotOnTick = self::DO_NOT_SNAPSHOT_ON_TICK,
     ) {
         $this->state = ProfileState::Created;
-        $this->isListeningToTicks = $listenToTicks ? false : null;
+        $this->isSnapshotingOnTick = $snapshotOnTick ? false : null;
         $this->timeBefore = OptionalFloat::empty();
         $this->memoryUsageBefore = OptionalInt::empty();
         $this->timeAfter = OptionalFloat::empty();
@@ -56,7 +56,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
 
     public function __destruct()
     {
-        $this->unregisterTickHandler();
+        $this->unregisterTickSnapshot();
     }
 
     public function getState(): ProfileState
@@ -77,7 +77,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
         $this->timeBefore = OptionalFloat::of(microtime(as_float: true));
         $this->memoryUsageBefore = OptionalInt::of(memory_get_usage(real_usage: true));
 
-        $this->registerTickHandler();
+        $this->registerTickSnapshot();
     }
 
     /**
@@ -85,7 +85,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      */
     public function finish(): void
     {
-        $this->unregisterTickHandler();
+        $this->unregisterTickSnapshot();
 
         if ($this->state !== ProfileState::Started) {
             throw new Exception\ProfileCouldNotBeFinished();
@@ -99,23 +99,23 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
     /**
      * @throws Exception\ProfileCouldNotRegisterTickHandler
      */
-    public function registerTickHandler(): void
+    public function registerTickSnapshot(): void
     {
-        if ($this->isListeningToTicks === false) {
-            register_tick_function([$this, 'tickHandler']) or throw new Exception\ProfileCouldNotRegisterTickHandler();
-            $this->isListeningToTicks = true;
+        if ($this->isSnapshotingOnTick === false) {
+            register_tick_function([$this, 'snapshot']) or throw new Exception\ProfileCouldNotRegisterTickHandler();
+            $this->isSnapshotingOnTick = true;
         }
     }
 
-    public function unregisterTickHandler(): void
+    public function unregisterTickSnapshot(): void
     {
-        if ($this->isListeningToTicks === true) {
-            unregister_tick_function([$this, 'tickHandler']);
-            $this->isListeningToTicks = false;
+        if ($this->isSnapshotingOnTick === true) {
+            unregister_tick_function([$this, 'snapshot']);
+            $this->isSnapshotingOnTick = false;
         }
     }
 
-    public function tickHandler(): void
+    public function snapshot(): void
     {
         $this->memoryUsages[sprintf(self::MICROTIME_FORMAT, microtime(as_float: true))] = memory_get_usage(real_usage: true);
     }
