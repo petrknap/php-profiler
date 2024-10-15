@@ -17,7 +17,26 @@ final class ProfilingTest extends TestCase
         self::assertEquals(1, round($profile->getDuration()));
     }
 
-    public function testThrowsOnSecondFinishCall(): void
+    public function testTouchesProfile(): void
+    {
+        $profiling = Profiling::start();
+        $profiling->touch();
+        $profile = $profiling->finish();
+
+        self::assertCount(2 + 1, $profile->getMemoryUsages());
+    }
+
+    public function testTouchThrowsOnFinishedProfile(): void
+    {
+        $profiling = Profiling::start();
+        $profiling->finish();
+
+        self::expectException(Exception\ProfilingHasBeenAlreadyFinished::class);
+
+        $profiling->touch();
+    }
+
+    public function testFinishThrowsOnFinishedProfile(): void
     {
         $profiling = Profiling::start();
         $profiling->finish();
