@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace PetrKnap\Profiler;
 
-use PHPUnit\Framework\TestCase;
-
-final class NullProfilerTest extends TestCase
+final class NullProfilerTest extends ProfilerTestCase
 {
     public function testCallsCallable(): void
     {
-        $profiler = new NullProfiler();
         $callableWasCalled = false;
 
-        $profiler->profile(static function () use (&$callableWasCalled): void {
+        self::getProfiler()->profile(static function () use (&$callableWasCalled): void {
             $callableWasCalled = true;
         });
 
@@ -22,23 +19,30 @@ final class NullProfilerTest extends TestCase
 
     public function testProfileReturnsCallablesOutput(): void
     {
-        $profiler = new NullProfiler();
-
-        $output = $profiler->profile(static fn (): string => 'output')->getOutput();
+        $output = self::getProfiler()->profile(static fn (): string => 'output')->getOutput();
 
         self::assertSame('output', $output);
     }
 
     public function testProfileDoesNotRunProcessorAndReturnsCallablesOutput(): void
     {
-        $profiler = new NullProfiler();
         $processorWasCalled = false;
 
-        $output = $profiler->profile(static fn (): string => 'output')->process(static function () use (&$processorWasCalled): void {
+        $output = self::getProfiler()->profile(static fn (): string => 'output')->process(static function () use (&$processorWasCalled): void {
             $processorWasCalled = true;
         });
 
         self::assertFalse($processorWasCalled);
         self::assertSame('output', $output);
+    }
+
+    protected static function getProfiler(): ProfilerInterface
+    {
+        return new NullProfiler();
+    }
+
+    protected static function getAllowedTimePerProfile(): float
+    {
+        return 0.000000001;
     }
 }
