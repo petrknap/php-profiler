@@ -11,17 +11,25 @@ final class Profiling
      */
     private function __construct(
         private readonly Profile $profile,
-        private readonly bool $listenToTicks,
+        private readonly bool $snapshotOnTick,
     ) {
     }
 
+    /**
+     * @param bool $snapshotOnTick if true, it will do snapshot on each tick
+     */
     public static function start(
-        bool $listenToTicks = Profile::DO_NOT_LISTEN_TO_TICKS,
+        bool $snapshotOnTick = Profile::DO_NOT_SNAPSHOT_ON_TICK,
+        /**
+         * @deprecated
+         * @todo remove it
+         */
+        bool $listenToTicks = Profile::DO_NOT_SNAPSHOT_ON_TICK,
     ): self {
-        $profile = new Profile($listenToTicks);
+        $profile = new Profile($listenToTicks || $snapshotOnTick);
         $profile->start();
 
-        return new self($profile, $listenToTicks);
+        return new self($profile, $listenToTicks || $snapshotOnTick);
     }
 
     /**
@@ -31,7 +39,7 @@ final class Profiling
     {
         $this->checkProfileState();
 
-        $this->profile->tickHandler();
+        $this->profile->snapshot();
     }
 
     /**
@@ -51,16 +59,16 @@ final class Profiling
      */
     public static function createNestedProfiler(Profiling $profiling): ProfilerInterface
     {
-        return new class ($profiling->profile, $profiling->listenToTicks) extends Profiler {
+        return new class ($profiling->profile, $profiling->snapshotOnTick) extends Profiler {
             /**
              * @param Profile<mixed> $parentProfile
              */
             public function __construct(
                 private readonly Profile $parentProfile,
-                bool $listenToTicks,
+                bool $snapshotOnTick,
             ) {
                 parent::__construct(
-                    listenToTicks: $listenToTicks,
+                    snapshotOnTick: $snapshotOnTick,
                 );
             }
 
@@ -70,14 +78,14 @@ final class Profiling
                     throw new Exception\ParentProfileIsNotStarted();
                 }
 
-                $this->parentProfile->unregisterTickHandler();
+                $this->parentProfile->unregisterTickSnapshot();
                 try {
                     $profile = parent::profile($callable);
                     $this->parentProfile->addChild($profile);
 
                     return $profile;
                 } finally {
-                    $this->parentProfile->registerTickHandler();
+                    $this->parentProfile->registerTickSnapshot();
                 }
             }
         };
