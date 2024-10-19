@@ -41,4 +41,13 @@ final class NullProfilerTest extends TestCase
         self::assertFalse($processorWasCalled);
         self::assertSame('output', $output);
     }
+
+    public function testSnapshotDoesNotThrow(): void
+    {
+        $profiler = new NullProfiler();
+
+        $profiler->snapshot();
+
+        self::assertTrue(true);
+    }
 }

@@ -29,4 +29,9 @@ namespace PetrKnap\Profiler;
 
         return $profile; // @phpstan-ignore return.type
     }
+
+    public function snapshot(): void
+    {
+        throw new Exception\ProfilerCouldNotSnapshotOutsideParentProfile();
+    }
 }

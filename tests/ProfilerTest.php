@@ -37,4 +37,22 @@ final class ProfilerTest extends TestCase
 
         self::assertSame('output', $profile->getOutput());
     }
+
+    public function testSnapshotsOnParentProfile(): void
+    {
+        $profiler = new Profiler();
+
+        $profile = $profiler->profile(static fn (ProfilerInterface $profiler) => $profiler->snapshot());
+
+        self::assertCount(2 + 1, $profile->getMemoryUsages());
+    }
+
+    public function testSnapshotsThrowsOutsideProfile(): void
+    {
+        $profiler = new Profiler();
+
+        self::expectException(Exception\ProfilerCouldNotSnapshotOutsideParentProfile::class);
+
+        $profiler->snapshot();
+    }
 }

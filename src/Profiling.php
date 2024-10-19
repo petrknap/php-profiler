@@ -88,6 +88,14 @@ final class Profiling
                     $this->parentProfile->registerTickSnapshot();
                 }
             }
+
+            public function snapshot(): void
+            {
+                if ($this->parentProfile->getState() !== ProfileState::Started) {
+                    throw new Exception\ProfilerCouldNotSnapshotOutsideParentProfile();
+                }
+                $this->parentProfile->snapshot();
+            }
         };
     }
 
