@@ -50,35 +50,35 @@ echo doSomething(new NullProfiler());
 
 ## Useful features
 
-### Snapshots
+### Take snapshot
 
-If you need to **measure the current values**, just call the `snapshot` method on the [`Profiling`](./src/Profiling.php).
+If you need to **measure the current values**, just call the `takeSnapshot` method on the [`Profiling`](./src/Profiling.php), or a [profiler](./src/ProfilerInterface.php).
 
 ```php
 namespace PetrKnap\Profiler;
 
 $profiling = Profiling::start();
 // do something
-$profiling->snapshot();
+$profiling->takeSnapshot();
 // do something more
 $profile = $profiling->finish();
 
 printf('There are %d memory usage records.', count($profile->getMemoryUsages()));
 ```
 
-If you want to automate it then use a [snapshot on tick](#snapshot-on-tick).
+If you want to automate it then [take snapshot on tick](#take-snapshot-on-tick).
 Or you can use a more practical [cascade profiling](#cascade-profiling).
 
-#### Snapshot on tick
+#### Take snapshot on tick
 
-For greater precision, you can force **snapshot on each `N` tick**.
+For greater precision, you can take **snapshot on each `N` tick**.
 
 ```php
 declare(ticks=2); // this declaration is important (N=2)
 
 namespace PetrKnap\Profiler;
 
-$profiling = Profiling::start(snapshotOnTick: true);
+$profiling = Profiling::start(takeSnapshotOnTick: true);
 (fn () => 'something')();
 $profile = $profiling->finish();
 

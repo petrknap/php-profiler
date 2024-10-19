@@ -17,23 +17,23 @@ final class ProfilingTest extends TestCase
         self::assertEquals(1, round($profile->getDuration()));
     }
 
-    public function testAddsSnapshotToProfile(): void
+    public function testTakesSnapshotOnProfile(): void
     {
         $profiling = Profiling::start();
-        $profiling->snapshot();
+        $profiling->takeSnapshot();
         $profile = $profiling->finish();
 
         self::assertCount(2 + 1, $profile->getMemoryUsages());
     }
 
-    public function testSnapshotThrowsOnFinishedProfile(): void
+    public function testTakeSnapshotThrowsOnFinishedProfile(): void
     {
         $profiling = Profiling::start();
         $profiling->finish();
 
         self::expectException(Exception\ProfilingHasBeenAlreadyFinished::class);
 
-        $profiling->snapshot();
+        $profiling->takeSnapshot();
     }
 
     public function testFinishThrowsOnFinishedProfile(): void

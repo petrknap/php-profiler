@@ -42,11 +42,11 @@ final class NullProfilerTest extends TestCase
         self::assertSame('output', $output);
     }
 
-    public function testSnapshotDoesNotThrow(): void
+    public function testTakeSnapshotDoesNotThrow(): void
     {
         $profiler = new NullProfiler();
 
-        $profiler->snapshot();
+        $profiler->takeSnapshot();
 
         self::assertTrue(true);
     }

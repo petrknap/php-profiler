@@ -46,7 +46,7 @@ final class NullProfiler implements ProfilerInterface
         };
     }
 
-    public function snapshot(): void
+    public function takeSnapshot(): void
     {
     }
 }

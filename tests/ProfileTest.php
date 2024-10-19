@@ -26,20 +26,20 @@ final class ProfileTest extends TestCase
         self::assertSame([$child1, $child2], $parent->getChildren());
     }
 
-    #[DataProvider('dataSnapshotsOnTick')]
-    public function testSnapshotsOnTick(bool|null $shouldItSnapshot): void
+    #[DataProvider('dataTakesSnapshotOnTick')]
+    public function testTakesSnapshotOnTick(bool|null $shouldItTakeSnapshot): void
     {
-        $profile = $shouldItSnapshot === null ? new Profile() : new Profile(snapshotOnTick: $shouldItSnapshot);
+        $profile = $shouldItTakeSnapshot === null ? new Profile() : new Profile(takeSnapshotOnTick: $shouldItTakeSnapshot);
         $profile->start();
         for ($i = 0; $i < 5; $i++) {
             $i = (fn (int $i): int => $i)($i);
         }
         $profile->finish();
 
-        self::assertCount($shouldItSnapshot === true ? 9 : 2, $profile->getMemoryUsages());
+        self::assertCount($shouldItTakeSnapshot === true ? 9 : 2, $profile->getMemoryUsages());
     }
 
-    public static function dataSnapshotsOnTick(): array
+    public static function dataTakesSnapshotOnTick(): array
     {
         return [
             'default' => [null],

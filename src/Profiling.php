@@ -11,35 +11,33 @@ final class Profiling
      */
     private function __construct(
         private readonly Profile $profile,
-        private readonly bool $snapshotOnTick,
+        private readonly bool $takeSnapshotOnTick,
     ) {
     }
 
-    /**
-     * @param bool $snapshotOnTick if true, it will do snapshot on each tick
-     */
     public static function start(
-        bool $snapshotOnTick = Profile::DO_NOT_SNAPSHOT_ON_TICK,
+        bool $takeSnapshotOnTick = Profile::DO_NOT_TAKE_SNAPSHOT_ON_TICK,
         /**
-         * @deprecated
+         * @deprecated backward compatibility with old named argument calls
+         *
          * @todo remove it
          */
-        bool $listenToTicks = Profile::DO_NOT_SNAPSHOT_ON_TICK,
+        bool $listenToTicks = Profile::DO_NOT_TAKE_SNAPSHOT_ON_TICK,
     ): self {
-        $profile = new Profile($listenToTicks || $snapshotOnTick);
+        $profile = new Profile($listenToTicks || $takeSnapshotOnTick);
         $profile->start();
 
-        return new self($profile, $listenToTicks || $snapshotOnTick);
+        return new self($profile, $listenToTicks || $takeSnapshotOnTick);
     }
 
     /**
      * @throws Exception\ProfilingHasBeenAlreadyFinished
      */
-    public function snapshot(): void
+    public function takeSnapshot(): void
     {
         $this->checkProfileState();
 
-        $this->profile->snapshot();
+        $this->profile->takeSnapshot();
     }
 
     /**
@@ -59,16 +57,16 @@ final class Profiling
      */
     public static function createNestedProfiler(Profiling $profiling): ProfilerInterface
     {
-        return new class ($profiling->profile, $profiling->snapshotOnTick) extends Profiler {
+        return new class ($profiling->profile, $profiling->takeSnapshotOnTick) extends Profiler {
             /**
              * @param Profile<mixed> $parentProfile
              */
             public function __construct(
                 private readonly Profile $parentProfile,
-                bool $snapshotOnTick,
+                bool $takeSnapshotOnTick,
             ) {
                 parent::__construct(
-                    snapshotOnTick: $snapshotOnTick,
+                    takeSnapshotOnTick: $takeSnapshotOnTick,
                 );
             }
 
@@ -78,23 +76,23 @@ final class Profiling
                     throw new Exception\ParentProfileIsNotStarted();
                 }
 
-                $this->parentProfile->unregisterTickSnapshot();
+                $this->parentProfile->unregisterTickHandlers();
                 try {
                     $profile = parent::profile($callable);
                     $this->parentProfile->addChild($profile);
 
                     return $profile;
                 } finally {
-                    $this->parentProfile->registerTickSnapshot();
+                    $this->parentProfile->registerTickHandlers();
                 }
             }
 
-            public function snapshot(): void
+            public function takeSnapshot(): void
             {
                 if ($this->parentProfile->getState() !== ProfileState::Started) {
-                    throw new Exception\ProfilerCouldNotSnapshotOutsideParentProfile();
+                    throw new Exception\ProfilerCouldNotTakeSnapshotOutsideParentProfile();
                 }
-                $this->parentProfile->snapshot();
+                $this->parentProfile->takeSnapshot();
             }
         };
     }

@@ -23,8 +23,8 @@ final class ReadmeTest extends TestCase implements MarkdownFileTestInterface
             'basic-profiling' => 'It took 0.0 s to do something.',
             'complex-profiling' => '',
             'how-to-enable-disable-it' => 'It took 0.0 s to do something.' . 'something' . 'something',
-            'snapshot' => 'There are 3 memory usage records.',
-            'snapshot-on-tick' => 'There are 3 memory usage records.',
+            'take-snapshot' => 'There are 3 memory usage records.',
+            'take-snapshot-on-tick' => 'There are 3 memory usage records.',
             'cascade-profiling' => 'There are 4 memory usage records.',
         ];
     }

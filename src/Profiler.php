@@ -6,22 +6,20 @@ namespace PetrKnap\Profiler;
 
 /* final */class Profiler implements ProfilerInterface
 {
-    /**
-     * @param bool $snapshotOnTick if true, it will do snapshot on each tick
-     */
     public function __construct(
-        private readonly bool $snapshotOnTick = Profile::DO_NOT_SNAPSHOT_ON_TICK,
+        private readonly bool $takeSnapshotOnTick = Profile::DO_NOT_TAKE_SNAPSHOT_ON_TICK,
         /**
-         * @deprecated
+         * @deprecated backward compatibility with old named argument calls
+         *
          * @todo remove it
          */
-        private readonly bool $listenToTicks = Profile::DO_NOT_SNAPSHOT_ON_TICK,
+        private readonly bool $listenToTicks = Profile::DO_NOT_TAKE_SNAPSHOT_ON_TICK,
     ) {
     }
 
     public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface
     {
-        $profiling = Profiling::start($this->snapshotOnTick, $this->listenToTicks);
+        $profiling = Profiling::start($this->takeSnapshotOnTick, $this->listenToTicks);
         $output = $callable(Profiling::createNestedProfiler($profiling));
         /** @var Profile<mixed> $profile */
         $profile = $profiling->finish();
@@ -30,8 +28,8 @@ namespace PetrKnap\Profiler;
         return $profile; // @phpstan-ignore return.type
     }
 
-    public function snapshot(): void
+    public function takeSnapshot(): void
     {
-        throw new Exception\ProfilerCouldNotSnapshotOutsideParentProfile();
+        throw new Exception\ProfilerCouldNotTakeSnapshotOutsideParentProfile();
     }
 }
