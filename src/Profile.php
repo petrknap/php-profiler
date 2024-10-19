@@ -18,13 +18,13 @@ use PetrKnap\Optional\OptionalInt;
  */
 final class Profile implements ProcessableProfileInterface, ProfileWithOutputInterface
 {
-    public const DO_NOT_SNAPSHOT_ON_TICK = false;
+    public const DO_NOT_TAKE_SNAPSHOT_ON_TICK = false;
 
     private const MICROTIME_FORMAT = '%.6f';
     private const SORTED_BY_TIME = true;
 
     private ProfileState $state;
-    private bool|null $isSnapshotingOnTick;
+    private bool|null $isTakingSnapshotOnTick;
     private OptionalFloat $timeBefore;
     private OptionalInt $memoryUsageBefore;
     private OptionalFloat $timeAfter;
@@ -43,10 +43,10 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
     private Optional $outputOption;
 
     public function __construct(
-        bool $snapshotOnTick = self::DO_NOT_SNAPSHOT_ON_TICK,
+        bool $takeSnapshotOnTick = self::DO_NOT_TAKE_SNAPSHOT_ON_TICK,
     ) {
         $this->state = ProfileState::Created;
-        $this->isSnapshotingOnTick = $snapshotOnTick ? false : null;
+        $this->isTakingSnapshotOnTick = $takeSnapshotOnTick ? false : null;
         $this->timeBefore = OptionalFloat::empty();
         $this->memoryUsageBefore = OptionalInt::empty();
         $this->timeAfter = OptionalFloat::empty();
@@ -56,7 +56,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
 
     public function __destruct()
     {
-        $this->unregisterTickSnapshot();
+        $this->unregisterTickHandlers();
     }
 
     public function getState(): ProfileState
@@ -77,7 +77,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
         $this->timeBefore = OptionalFloat::of(microtime(as_float: true));
         $this->memoryUsageBefore = OptionalInt::of(memory_get_usage(real_usage: true));
 
-        $this->registerTickSnapshot();
+        $this->registerTickHandlers();
     }
 
     /**
@@ -85,7 +85,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
      */
     public function finish(): void
     {
-        $this->unregisterTickSnapshot();
+        $this->unregisterTickHandlers();
 
         if ($this->state !== ProfileState::Started) {
             throw new Exception\ProfileCouldNotBeFinished();
@@ -99,23 +99,23 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
     /**
      * @throws Exception\ProfileCouldNotRegisterTickHandler
      */
-    public function registerTickSnapshot(): void
+    public function registerTickHandlers(): void
     {
-        if ($this->isSnapshotingOnTick === false) {
-            register_tick_function([$this, 'snapshot']) or throw new Exception\ProfileCouldNotRegisterTickHandler();
-            $this->isSnapshotingOnTick = true;
+        if ($this->isTakingSnapshotOnTick === false) {
+            register_tick_function([$this, 'takeSnapshot']) or throw new Exception\ProfileCouldNotRegisterTickHandler();
+            $this->isTakingSnapshotOnTick = true;
         }
     }
 
-    public function unregisterTickSnapshot(): void
+    public function unregisterTickHandlers(): void
     {
-        if ($this->isSnapshotingOnTick === true) {
-            unregister_tick_function([$this, 'snapshot']);
-            $this->isSnapshotingOnTick = false;
+        if ($this->isTakingSnapshotOnTick === true) {
+            unregister_tick_function([$this, 'takeSnapshot']);
+            $this->isTakingSnapshotOnTick = false;
         }
     }
 
-    public function snapshot(): void
+    public function takeSnapshot(): void
     {
         $this->memoryUsages[sprintf(self::MICROTIME_FORMAT, microtime(as_float: true))] = memory_get_usage(real_usage: true);
     }
@@ -145,8 +145,7 @@ final class Profile implements ProcessableProfileInterface, ProfileWithOutputInt
 
     public function getOutput(): mixed
     {
-        /** @var TOutput */
-        return $this->outputOption->orElseThrow()->orElse(null);
+        return $this->outputOption->orElseThrow()->orElse(null); // @phpstan-ignore return.type
     }
 
     public function addChild(ProfileInterface $child): void

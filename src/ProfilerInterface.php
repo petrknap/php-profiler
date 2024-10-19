@@ -16,7 +16,7 @@ interface ProfilerInterface
     public function profile(callable $callable): ProcessableProfileInterface & ProfileWithOutputInterface;
 
     /**
-     * @throws Exception\ProfilerCouldNotSnapshotOutsideParentProfile
+     * @throws Exception\ProfilerCouldNotTakeSnapshotOutsideParentProfile
      */
-    public function snapshot(): void;
+    public function takeSnapshot(): void;
 }
