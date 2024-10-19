@@ -1,4 +1,4 @@
-- [ ] This pull request does not contain any breaking change
+- [ ] This pull request does not contain any breaking change.
 - [ ] I asked [the AI](https://copilot.microsoft.com/) to briefly summarize, use and improve the feature(s), and I'm okay with the output:
 <!-- ⇅ remove it if it doesn't make sense ⇅ -->
 <!-- ↓ here belongs the AI inputs (>>) and outputs (>) ↓ -->

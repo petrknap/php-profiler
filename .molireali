@@ -3,6 +3,7 @@ composer PetrKnap\\Profiler
 dockerfile php 8.1-cli
 docker-scripts petrknap/php-profiler
 donation
+github-templates
 github-workflow docker "composer ci-script"
 github-workflow linter-docker
 github-workflow linter-php 8.1
