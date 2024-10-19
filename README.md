@@ -2,9 +2,9 @@
 
 This tool allows you to monitor performance and detect memory leaks as well as inconsistent performance behavior of your application over time.
 
-## Short-term profiling
+## Basic profiling
 
-For **short-term profiling** you can use a [profiling helper](./src/Profiling.php).
+For basic profiling you can use a profiling helper.
 The [`Profiling`](./src/Profiling.php) will allow you to profile between `start` and `finish` methods calls.
 
 ```php
@@ -17,10 +17,10 @@ $profile = $profiling->finish();
 printf('It took %.1f s to do something.', $profile->getDuration());
 ```
 
-The [`Profiling`](./src/Profiling.php) is simple - **cannot be turned on and off** easily.
-So a [profiler](./src/ProfilerInterface.php) was created for the purpose of hard-coded long-term profiling.
+The [`Profiling`](./src/Profiling.php) is simple and **cannot be turned on and off** easily.
+So a [profiler](./src/ProfilerInterface.php) was created for the purpose of hard-coded more complex profiling.
 
-## Long-term profiling
+## Complex profiling
 
 Request a [profiler](./src/ProfilerInterface.php) as a dependency and call a `profile` method on it.
 
@@ -28,9 +28,7 @@ Request a [profiler](./src/ProfilerInterface.php) as a dependency and call a `pr
 namespace PetrKnap\Profiler;
 
 function doSomething(ProfilerInterface $profiler): string {
-    // do something without profiling
     return $profiler->profile(function (): string {
-        // do something
         return 'something';
     })->process(fn (ProfileInterface $profile) => printf(
         'It took %.1f s to do something.',
@@ -50,6 +48,45 @@ echo doSomething(new Profiler());
 echo doSomething(new NullProfiler());
 ```
 
+## Useful features
+
+### Snapshots
+
+If you need to **measure the current values**, just call the `snapshot` method on the [`Profiling`](./src/Profiling.php).
+
+```php
+namespace PetrKnap\Profiler;
+
+$profiling = Profiling::start();
+// do something
+$profiling->snapshot();
+// do something more
+$profile = $profiling->finish();
+
+printf('There are %d memory usage records.', count($profile->getMemoryUsages()));
+```
+
+If you want to automate it then use a [snapshot on tick](#snapshot-on-tick).
+Or you can use a more practical [cascade profiling](#cascade-profiling).
+
+#### Snapshot on tick
+
+For greater precision, you can force **snapshot on each `N` tick**.
+
+```php
+declare(ticks=2); // this declaration is important (N=2)
+
+namespace PetrKnap\Profiler;
+
+$profiling = Profiling::start(listenToTicks: true);
+(fn () => 'something')();
+$profile = $profiling->finish();
+
+printf('There are %d memory usage records.', count($profile->getMemoryUsages()));
+```
+
+This will result in **very detailed code tracking**, which can degrade the performance of the monitored application.
+
 ### Cascade profiling
 
 The `profile` method provides you a nested [profiler](./src/ProfilerInterface.php) that you can use for more detailed cascade profiling.
@@ -57,29 +94,12 @@ The `profile` method provides you a nested [profiler](./src/ProfilerInterface.ph
 ```php
 namespace PetrKnap\Profiler;
 
-echo (new Profiler())->profile(function (ProfilerInterface $profiler): string {
-    // do something before something
-    return doSomething($profiler);
-})->process(fn (ProfileInterface $profile) => printf(
-    'It took %.1f s to do something before something and something, there are %d children profiles.',
-    $profile->getDuration(),
-    count($profile->getChildren()),
-));
-```
-
-### Tick listening
-
-For greater precision, you can use measurements at each `N` tick.
-This will result in **very detailed code tracking**, which can degrade the performance of the monitored application.
-
-```php
-declare(ticks=3); // this declaration is important (N=3)
-
-namespace PetrKnap\Profiler;
-
-$profiling = Profiling::start(listenToTicks: true);
-doSomething(new NullProfiler());
-$profile = $profiling->finish();
+$profile = (new Profiler())->profile(function (ProfilerInterface $profiler): void {
+    // do something
+    $profiler->profile(function (): void {
+        // do something more
+    });
+});
 
 printf('There are %d memory usage records.', count($profile->getMemoryUsages()));
 ```
